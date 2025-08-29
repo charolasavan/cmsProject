@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File
 from sqlalchemy.orm import Session
 from app import models
-from app.schemas.user import UserBase,LoginRequest
+from app.schemas.user import UserBase
 from app.database import SessionLocal
 from datetime import date
 from typing import Optional
