@@ -2,4 +2,6 @@ fastapi
 uvicorn
 sqlalchemy
 python-multipart
+PyJWT
 requests
+pymysql
