@@ -8,6 +8,8 @@ from typing import Optional
 import uuid
 import os
 from pathlib import Path
+from sqlalchemy import or_
+
 
 router = APIRouter(prefix="/users", tags=["Users"])
 UPLOAD_FOLDER = Path("app/static/uploads/")
@@ -20,28 +22,18 @@ def get_db():
     finally:
         db.close()
 
+@router.post("/login/")
+async def login( email_id: str = Form(...), user_password: str = Form(...), db: Session = Depends(get_db) ):
 
-
-# @router.post("/login")
-# async def valid_user(user: LoginRequest, db: Session = Depends(get_db)):
-#     db_user = db.query(models.User).filter(
-#         and_(
-#             models.User.email_id == user.email_id,
-#             models.User.user_password == user.user_password
-#         )
-#     ).first()
-
-#     if not db_user:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
-
-#     return {
-#         "message": "Login successful",
-#         "user_id": db_user.id,
-#         "email": db_user.email_id,
-#         "name": db_user.user_name,
-#         "token": "fake-jwt-token"  # Placeholder token
-#     }
-
+    db_user = db.query(models.User).filter(models.User.email_id == email_id).first()
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid EmailId")
+    
+    if db_user.user_password != user_password :
+        
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Password")
+        
+    return db_user   
 
 
 @router.get("/")
@@ -64,6 +56,17 @@ async def create_user(
     profile_img: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
+    existing = db.query(models.User).filter(       
+            models.User.user_name == user_name,
+            models.User.email_id == email_id,
+            models.User.user_password == user_password,
+            models.User.phone_number == phone_number,
+        ).first()
+    if existing :
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This User is already exitsting"
+        )
 
     # Save the image file
     image_location = UPLOAD_FOLDER / profile_img.filename

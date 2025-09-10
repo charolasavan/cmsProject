@@ -24,7 +24,7 @@
 
 # class UserBase(BaseModel):
 #     user_name: str
-#     user_email: str
+#     email_id: str
 #     user_password: str
 
 # class CategoryBase(BaseModel):
@@ -285,7 +285,7 @@ from app import models
 from app.database import engine
 from fastapi.staticfiles import StaticFiles
 from app.database import SessionLocal
-
+from pathlib import Path
 
 app = FastAPI()
 
@@ -293,6 +293,8 @@ models.Base.metadata.create_all(bind=engine)
 
 # Save image file in static folder 
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
+UPLOAD_FOLDER = Path("app/static/uploads")
+UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
 app.add_middleware(
     CORSMiddleware,
@@ -305,3 +307,5 @@ app.add_middleware(
 app.include_router(users.router)
 app.include_router(category.router)
 app.include_router(products.router)
+
+    

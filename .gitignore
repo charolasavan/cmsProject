@@ -1,0 +1,13 @@
+# Node modules (React)
+react/fastapi/node_modules/
+
+# Python cache (FastAPI)
+fastapi/__pycache__/
+backend/*.pyc
+
+# Virtual environments
+venv/
+.env
+
+# Build files
+react/fastapi/build/

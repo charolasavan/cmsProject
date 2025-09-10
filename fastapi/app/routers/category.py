@@ -17,6 +17,13 @@ def get_db():
     finally:
         db.close()
 
+
+
+@router.get("/", response_model=List[Subcategory], status_code=status.HTTP_200_OK)
+async def list_categories(db: Session = Depends(get_db)):
+    categories = db.query(models.Category).all()
+    return get_all_subcategories(categories)
+
 def get_all_subcategories(data: List[models.Category], parent_id: Optional[int] = None) -> List[Subcategory]:
     subcategories = []
     for category in data:
@@ -29,18 +36,13 @@ def get_all_subcategories(data: List[models.Category], parent_id: Optional[int] 
             )
             subcategories.append(category_data)
     return subcategories
-
-@router.get("/", response_model=List[Subcategory], status_code=status.HTTP_200_OK)
-async def list_categories(db: Session = Depends(get_db)):
-    categories = db.query(models.Category).all()
-    return get_all_subcategories(categories)
-
+ 
 @router.post("/", response_model=CategoryBase, status_code=status.HTTP_201_CREATED)
 async def create_category(category: CategoryBase, db: Session = Depends(get_db)):
     existing = db.query(models.Category).filter(models.Category.category_name == category.category_name).first()
     if existing:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
+            status_code=status.HTTP_409_CONFLICT,   
             detail="Category with this name already exists."
         )
 
@@ -86,11 +88,23 @@ async def update_category(category_id: int, category: CategoryBase, db: Session 
     db.refresh(db_category)
     return db_category
 
+# @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+# async def delete_category(category_id: int, db: Session = Depends(get_db)):
+#     db_category = db.query(models.Category).filter(models.Category.category_id == category_id).first()
+#     if not db_category:
+#         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
+#     db.query(models.Category).filter(models.Category.category_id == category_id).delete()
+#     db.delete(db_category)
+#     db.commit()
+#     # db.refresh()
+#     return None
+
 @router.delete("/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_category(category_id: int, db: Session = Depends(get_db)):
     db_category = db.query(models.Category).filter(models.Category.category_id == category_id).first()
     if not db_category:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
-    db.query(models.Category).filter(models.Category.category_id == category_id).delete()
+
     db.delete(db_category)
     db.commit()
+    return None
