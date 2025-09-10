@@ -1,0 +1,144 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  height: 56px;
+  background-color: #343a40;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  justify-content: space-between;
+}
+
+.header .menu-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Main content area */
+.main-content {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 15%;
+  background-color: #343a40;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  flex-shrink: 0;
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar.hidden {
+  transform: translateX(-100%);
+  position: fixed;
+  height: 100vh;
+  z-index: 1030;
+  top: 56px;
+  left: 0;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+}
+
+.sidebar a {
+  color: white;
+  padding: 12px 20px;
+  text-decoration: none;
+  font-weight: 500;
+  display: block;
+  transition: background-color 0.3s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+  background-color: #495057;
+  color: white;
+}
+
+/* Content */
+.content-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 56px;
+  left: 0;
+  width: 100vw;
+  height: calc(100vh - 56px);
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1020;
+  display: none;
+}
+
+.overlay.show {
+  display: block;
+}
+
+/* Responsive */
+@media(max-width:767px){
+  .sidebar{
+    width: 100%;
+  }
+}
+@media (min-width: 768px) {
+  .sidebar {
+    transform: none !important;
+    position: relative !important;
+    height: auto !important;
+    box-shadow: none !important;
+  }
+  .overlay {
+    display: none !important;
+  }
+}
+
