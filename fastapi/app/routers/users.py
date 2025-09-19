@@ -1,20 +1,65 @@
+# from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File
+# from sqlalchemy.orm import Session
+# from app import models
+# from app.schemas.user import UserBase
+# from app.database import SessionLocal
+# from datetime import date
+# from typing import Optional
+# import uuid
+# import os
+# from pathlib import Path
+# from sqlalchemy import or_
+
+
+# router = APIRouter(prefix="/users", tags=["Users"])
+# UPLOAD_FOLDER = Path("app/static/uploads/")
+# UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
+
+# def get_db():
+#     db = SessionLocal()
+#     try:
+#         yield db
+#     finally:
+#         db.close()
+
+# @router.post("/login/")
+# async def login( email_id: str = Form(...), user_password: str = Form(...), db: Session = Depends(get_db) ):
+
+#     db_user = db.query(models.User).filter(models.User.email_id == email_id).first()
+#     if not db_user:
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid EmailId")
+    
+#     if db_user.user_password != user_password :
+        
+#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Password")
+        
+#     return db_user   
+
+
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File
 from sqlalchemy.orm import Session
+from jose import JWTError, jwt
+from datetime import datetime, timedelta, date
+from typing import Optional
+from pathlib import Path
+import uuid
+
 from app import models
 from app.schemas.user import UserBase
 from app.database import SessionLocal
-from datetime import date
-from typing import Optional
-import uuid
-import os
-from pathlib import Path
-from sqlalchemy import or_
 
 
+SECRET_KEY = "your_secret_key_here"  
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+# Setup
 router = APIRouter(prefix="/users", tags=["Users"])
 UPLOAD_FOLDER = Path("app/static/uploads/")
 UPLOAD_FOLDER.mkdir(parents=True, exist_ok=True)
 
+
+# --- Dependencies ---
 def get_db():
     db = SessionLocal()
     try:
@@ -22,18 +67,67 @@ def get_db():
     finally:
         db.close()
 
-@router.post("/login/")
-async def login( email_id: str = Form(...), user_password: str = Form(...), db: Session = Depends(get_db) ):
 
+# --- JWT Utilities ---
+def create_access_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def verify_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except JWTError:
+        return None
+
+
+# --- Auth Protected Dependency ---
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login/")
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    payload = verify_token(token)
+    if not payload or "user_id" not in payload:
+        raise credentials_exception
+    return payload
+
+
+# --- Auth/Login ---
+@router.post("/login/")
+async def login(email_id: str = Form(...), user_password: str = Form(...), db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.email_id == email_id).first()
+    
     if not db_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid EmailId")
     
     if db_user.user_password != user_password :
-        
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Password")
-        
-    return db_user   
+    
+    if not db_user or db_user.user_password != user_password:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+
+
+    token = create_access_token({"sub": db_user.email_id, "user_id": db_user.id})
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+        "user": {
+            "id": db_user.id,
+            "user_name": db_user.user_name,
+            "email_id": db_user.email_id,
+            "profile_img": db_user.profile_img
+        }
+    }
+
 
 
 @router.get("/")

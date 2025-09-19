@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { data, useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -17,55 +17,57 @@ const EditProduct = () => {
         product_brand: '',
         product_company: '',
         category_id: '',
-        thumbnail_image: null
+        thumbnail_image: null,
+        image_name: []
     });
     const [categories, setCategories] = useState([]);
     // Fetch product data
+    const fetchProducts = async () => {
+        try {
+            const res = await api.get(`/products/${id}`);
+            setValue({
+                product_name: res.data[0].product_name,
+                product_price: res.data[0].product_price,
+                product_brand: res.data[0].product_brand,
+                product_company: res.data[0].product_company,
+                category_id: res.data[0].category_id,
+                thumbnail_image: res.data[0].thumbnail_image,
+                image_name: res.data[0].images,
+            });
+        }
 
+        catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops..",
+                text: error?.response?.data?.detail || error.message || "Faild To Fetch Iteam"
+            });
+        }
+    };
 
 
     // Fetch product categories
+    const fetchCategories = async () => {
+        try {
+            const { data } = await api.get('/category/');
+            setCategories(data);
+        }
 
+        catch (error) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops..",
+                text: error?.response?.data?.detail || error.message || "Faild To Fetch Category"
+            });
+        }
+    };
 
     // UseEffect to fetch product and categories
     useEffect(() => {
 
-        const fetchProducts = async () => {
-            try {
-                const res = await api.get(`/products/${id}`);
-                setValue({
-                    product_name: res.data.product_name,
-                    product_price: res.data.product_price,
-                    product_brand: res.data.product_brand,
-                    product_company: res.data.product_company,
-                    category_id: res.data.category_id,
-                    thumbnail_image: res.data.thumbnail_image
-                });
 
-                // console.log(res)
-            }
-            catch (error) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops..",
-                    text: error?.response?.data?.detail || error.message || "Faild To Fetch Iteam"
-                });
-            }
-        };
-        const fetchCategories = async () => {
-            try {
-                const { data } = await api.get('/category/');
-                setCategories(data);
-            }
+        // console.log(value)
 
-            catch (error) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops..",
-                    text: error?.response?.data?.detail || error.message || "Faild To Fetch Category"
-                });
-            }
-        };
         fetchProducts();
         fetchCategories();
     }, [id]);
@@ -84,7 +86,36 @@ const EditProduct = () => {
             }));
         }
     };
+    const handleDelete = async (id) => {
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        })
 
+        if (result.isConfirmed) {
+            try {
+                await api.delete(`/products/product_image/${id}`);
+                fetchProducts();
+                Swal.fire({
+                    title: "Deleted!",
+                    text: "Your Image has been deleted.",
+                    icon: "success"
+                });
+            }
+            catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Faild",
+                    text: error?.response?.data?.detail || error.message || "Faild To Delete Image"
+                });
+            }
+        }
+    };
 
     const renderOptions = (items, depth = 0) =>
         items.flatMap(({ category_id, category_name, children = [] }) => [
@@ -173,29 +204,11 @@ const EditProduct = () => {
                     <Form.Group className="mb-3" >
                         <Form.Label>Product Company</Form.Label>
                         <Form.Control type="text" placeholder="Enter Company" name='product_company' value={value.product_company} onChange={handleChange} required />
-
                     </Form.Group>
+
                     <Form.Group className="mb-3">
-
                         <Form.Label>Thumbnail Image</Form.Label>
-                        {/* <div className='mb-3'>
-                            <img
-                                className='thumbnail_img'
-                                src={`http://localhost:8000${value.thumbnail_image}`}  // Display image with full URL
-                                alt='thumbnail_image'
-                            />
-                        </div>
-                        <Form.Control
-                            type="file"
-                            name="thumbnail_image"
-                            accept="image/*"
-                            onChange={handleChange}
-                            required
-                        /> */}
-
                         <Form.Group className="mb-3">
-
-                            <Form.Label>Profile Image</Form.Label>
                             <div className='mb-3'>
                                 <img
                                     className='thumbnail_img'
@@ -204,9 +217,7 @@ const EditProduct = () => {
                                             ? URL.createObjectURL(value.thumbnail_image)
                                             : `http://localhost:8000${value.thumbnail_image}`
                                     }
-                                    height={50}
-
-                                    alt='profile_img'
+                                    alt='thumbnail_image'
                                 />
                             </div>
                             <Form.Control
@@ -214,16 +225,55 @@ const EditProduct = () => {
                                 name="thumbnail_image"
                                 accept="image/*"
                                 onChange={handleChange}
-                                required
 
                             />
-
                         </Form.Group>
-
                     </Form.Group>
 
+                    <div className='image_display'>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Product Image</Form.Label>
+                            <Form.Group className="mb-3">
+                                <div className='image_view mb-3'>
+                                    {value.image_name.map((name, index) => {
+                                        return (
+                                            <div key={index} className='main-image-layout' >
+                                                <img
+                                                    className='product_image'
+                                                    src={`http://localhost:8000${name.image_name}`}
+                                                    alt='productImage'
+                                                    height={80}
+                                                    width={100}
+                                                />
+                                                <div className='w-100 text-center'>
+                                                    <Button variant='danger'
+                                                        onClick={() => {
+                                                            handleDelete(name.id)
+                                                        }}
+                                                    >Delete</Button>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </Form.Group>
+                        </Form.Group>
+                        <Form.Group className="mb-3">
+                            <Form.Label>Add Product Images</Form.Label>
+                            <Form.Group className="mb-3">
+                                <Form.Control
+                                    type="file"
+                                    name="image_name"
+                                    accept="image/*"
+                                    onChange={handleChange}
+                                    multiple
+
+                                />
+                            </Form.Group>
+                        </Form.Group>
 
 
+                    </div>
                     <div className='d-flex'>
                         <Button className='me-2' variant="primary" type="submit" >
                             Update

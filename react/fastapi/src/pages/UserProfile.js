@@ -49,7 +49,7 @@ function UserProfile() {
 
         <Card.Body className="p-4">
           <Link to={`/edituser/${userData.id}`}>
-            <Button>Edit</Button>
+            <Button variant='btn btn-success'>update</Button>
           </Link>
           <Row className="mb-4 justify-content-center text-center">
             <Col xs="auto">
@@ -59,7 +59,7 @@ function UserProfile() {
                 roundedCircle
                 width={120}
                 height={120}
-                className="shadow-sm border border-light"
+                className="shadow-sm border border-light object-fit-cover"
               />
               <h5 className="mt-3 mb-0">{userData.user_name}</h5>
             </Col>

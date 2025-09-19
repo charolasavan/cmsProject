@@ -5,11 +5,9 @@ import { Link } from 'react-router-dom';
 import api from '../../api';
 import Swal from 'sweetalert2';
 
-
 function CategoryList() {
-  const [categories, setCategories] = useState([]);
-  const [form, setForm] = useState({ category_name: '', parent_id: 0 });
-  // const [error, setError] = useState('');
+  const [categories, setCategories] = useState([]); // setCategory for select Product
+  const [form, setForm] = useState({ category_name: '', parent_id: 0 });   // setFormCategory
 
   // Load Then Fetch all categories
   useEffect(() => {
@@ -65,22 +63,16 @@ function CategoryList() {
       });
     }
     catch (error) {
-
-      // setError(err.response?.data?.detail || "Failed to add category.");
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: error.response?.data?.detail || "Failed to Fetch Category.",
       });
-
-
     }
   };
 
-
   // delete categories
   const handleDelete = async (id) => {
-
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -90,7 +82,6 @@ function CategoryList() {
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, delete it!"
     })
-
     if (result.isConfirmed) {
       try {
         await api.delete(`/category/${id}`);
@@ -100,8 +91,8 @@ function CategoryList() {
           text: "Your Category has been deleted.",
           icon: "success"
         });
-
       }
+
       catch (error) {
         Swal.fire({
           icon: "error",
@@ -109,12 +100,10 @@ function CategoryList() {
           text: error?.response?.data?.detail || error.message || "Faild To Delete"
         });
 
-        console.error(error)
       }
     }
-
-
   };
+
 
   // recursive method to display nth level categories
   const renderOptions = (items, depth = 0) =>
@@ -125,29 +114,31 @@ function CategoryList() {
       ...renderOptions(children, depth + 1)
     ]);
 
-
   // display table using recursive method
-  const renderRows = (items) =>
-    items.flatMap(({ category_id, category_name, parent_id, children = [] }) => [
-      <tr key={category_id}>
-        <td>{category_id}</td>
-        <td>{category_name}</td>
-        <td>{parent_id ?? 'NULL'}</td>
-        <td>
-          <Link to={`/editcategory/${category_id}`}>
-            <Button>Edit</Button>
-          </Link>
-        </td>
-        <td>
-          <Button variant="danger" onClick={() => handleDelete(category_id)}>
-            Delete
-          </Button>
-        </td>
-      </tr>,
-      ...renderRows(children)
-    ]);
-
-
+  let count = 0;   // display Counte of category number
+  const renderCategory = (items, depth = 0) => {
+    return items.flatMap(({ category_id, category_name, children = [] }) => {
+      count++;
+      return [
+        <tr key={category_id}>
+          <td>{count}</td>
+          <td>{category_id}</td>
+          <td>{`${'-'.repeat(depth)}${category_name}`}</td>
+          <td>
+            <Link to={`/editcategory/${category_id}`}>
+              <Button>Edit</Button>
+            </Link>
+          </td>
+          <td>
+            <Button variant="danger" onClick={() => handleDelete(category_id)}>
+              Delete
+            </Button>
+          </td>
+        </tr>,
+        ...renderCategory(children, depth + 1)
+      ];
+    });
+  };
 
   return (
     <div className="m-2">
@@ -173,22 +164,23 @@ function CategoryList() {
             required
           />
         </Form.Group>
-
-        <Button type="submit" variant='primary'>Add</Button>
-        {/* {error && <p className="text-danger">{error}</p>} */}
+        <Button type="submit" variant='primary'>Add Category</Button>
       </Form>
 
+      {/* display category in table */}
       <Table striped bordered hover className="text-center mt-5">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>No</th>
+            <th>Category Id</th>
             <th>Category</th>
-            <th>Parent ID</th>
             <th>Edit</th>
             <th>Delete</th>
           </tr>
         </thead>
-        <tbody>{renderRows(categories)}</tbody>
+        <tbody>
+          {renderCategory(categories)}
+        </tbody>
       </Table>
     </div>
   );

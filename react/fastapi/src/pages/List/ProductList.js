@@ -1,21 +1,25 @@
 import Button from 'react-bootstrap/Button';
 import React, { useState, useEffect } from 'react';
 import Table from 'react-bootstrap/Table';
-// import Form from 'react-bootstrap/Form';
+import 'swiper/css';
 import api from '../../api';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Swal from 'sweetalert2';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function ProductList() {
   const [productData, setProductData] = useState([])
+  // const [isOpen, setIsOpen] = useState(false)
   const navigate = useNavigate();
+
   // FetchAll product 
   const fetchProduct = async () => {
     try {
       const response = await api.get('/products/')
       setProductData(response.data);
-      console.log(response)
     }
     catch (error) {
       Swal.fire({
@@ -25,20 +29,6 @@ function ProductList() {
       });
     }
   };
-
-  // fetch category
-
-  // const fetchCategory = async () => {
-  //   try {
-  //     const response = await api.get('/products/')
-  //     setCategory(response.data)
-
-  //   }
-  //   catch (error) {
-  //     console.error("Error fetching items:", error);
-  //   }
-  // }
-
   // Handle Delete product 
 
   const handleDelete = async (id) => {
@@ -54,7 +44,6 @@ function ProductList() {
 
     if (result.isConfirmed) {
       try {
-
         await api.delete(`/products/${id}`);
         setProductData(productData.filter(productData => productData.id !== id));
         Swal.fire({
@@ -80,19 +69,16 @@ function ProductList() {
 
   useEffect(() => {
     fetchProduct();
-    // fetchCategory();
-    // fetchImage()
   }, []);
-
-
-  // handle category
-  // const handleCategory = (e) => {
-  //   e.preventDefault()
-  //   // console.log(select.current)
-  //   // console.log(category)
-
-  // }
-
+  const settings = {
+    dots: true,
+    lazyLoad: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    initialSlide: 2
+  };
 
   return (
     <div>
@@ -100,9 +86,9 @@ function ProductList() {
 
       <div className='mt-3'>
         <Button className='mb-3' variant='primary' onClick={() => navigate('/products/add')}>
-          Add
+          Add Product
         </Button>
-        <Table striped bordered hover className='text-center'>
+        <Table striped bordered hover className='text-center' responsive>
           <thead>
             <tr>
               <th>id</th>
@@ -112,6 +98,7 @@ function ProductList() {
               <th>Product Company</th>
               <th>Product Category</th>
               <th>Thumbnail Images</th>
+              {/* <th>Images</th> */}
               <th>Edit</th>
               <th>Delete</th>
             </tr>
@@ -133,6 +120,44 @@ function ProductList() {
                       alt='productImage'
                     />
                   </td>
+                  {/* <td>
+                    <Button variant='success'
+                      onClick={() => { setIsOpen(!isOpen) }}
+                    >View</Button>
+                    {isOpen && (
+                      <>
+                        <div className='product_image_viewer'>
+                          <div className='d-flex justify-content-end'>
+                            <Button
+                              onClick={() => { setIsOpen(!isOpen) }}>
+                              Close
+                            </Button>
+                          </div>
+                          <div>
+                            <div className="slider-container">
+                              <Slider {...settings}>
+
+                                {data.images.map((name, index) => {
+                                  return (
+                                    <div key={index} className='d-flex justify-content-center' >
+                                      <img
+                                        className='product_image'
+                                        src={`http://localhost:8000${name.image_name}`}
+                                        alt='productImage'
+                                      />
+                                    </div>
+                                  )
+
+                                })}
+                              </Slider>
+                            </div>
+                          </div>
+
+                        </div>
+                      </>
+
+                    )}
+                  </td> */}
                   <td>
                     <Link to={`/EditProduct/${data.id}`}>
                       <Button>Edit</Button>
@@ -149,6 +174,8 @@ function ProductList() {
             })}
           </tbody>
         </Table>
+
+
       </div>
 
     </div >

@@ -5,6 +5,70 @@ from app.database import SessionLocal
 from app.database import Base
 from sqlalchemy.orm import relationship
 
+# class User(Base):
+#     __tablename__ = "Users"
+#     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+#     user_name = Column(String(50), nullable=False)
+#     email_id = Column(String(50), nullable=False, unique=True)
+#     user_password = Column(String(50), nullable=False, unique=True)
+#     phone_number = Column(BigInteger, nullable=False, unique=True)
+#     dob = Column(Date, nullable=False)
+#     gender = Column(String(50), nullable=False )
+#     address = Column(String(50), nullable=False)
+#     city = Column(String(50), nullable=False)
+#     state = Column(String(50), nullable=False)
+#     zip_code = Column(String(50), nullable=False)
+#     country = Column(String(50), nullable=False)
+#     profile_img = Column(String(250), nullable=True)
+    
+# class Products(Base):
+#     __tablename__ = "products"
+#     id = Column(Integer, primary_key=True, index=True , autoincrement=True)
+#     product_name = Column(String(50),  )
+#     product_price = Column(String(50))
+#     product_brand = Column(String(50),)
+#     product_company = Column(String(50), )
+#     category_id = Column(Integer, ForeignKey("product_category.category_id"), nullable=False)
+#     thumbnail_image = Column(String(250))
+#     category = relationship("Category", backref="products")
+#     # image_name = relationship("ProductImage", back_populates="product")
+    
+
+    
+    
+# # class Category(Base):
+# #     __tablename__ = 'product_category'
+# #     category_id = Column(Integer, primary_key=True, index=True, nullable = True)
+# #     category_name = Column(String, nullable=False)
+# #     parent_id = Column(Integer, ForeignKey('product_category.category_id', ondelete="CASCADE"), nullable=True)  
+
+# class Category(Base):
+#     __tablename__ = 'product_category'
+#     category_id = Column(Integer, primary_key=True, nullable=False, index=True)
+#     category_name = Column(String, nullable=False)
+#     parent_id = Column(Integer, ForeignKey('product_category.category_id', ondelete="CASCADE"), nullable=True)
+
+#     subcategories = relationship(
+#         "Category",
+#         backref=backref("parent", remote_side=[category_id]),
+#         cascade="all, delete-orphan"
+#     )
+    
+    
+# class ProductImage(Base):
+#     __tablename__ = "product_images"
+#     id = Column(Integer, primary_key=True, index=True , autoincrement=True)
+#     image_name = Column(String(250))
+#     product_id = Column(Integer, ForeignKey("product.id"), nullable=False)
+
+#     # product = relationship("Product", back_populates="image_name")
+
+
+
+from sqlalchemy import Column, Integer, String, ForeignKey, Float
+# from sqlalchemy.orm import relationship, backref
+# from app.database import Base
+
 class User(Base):
     __tablename__ = "Users"
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
@@ -20,28 +84,10 @@ class User(Base):
     zip_code = Column(String(50), nullable=False)
     country = Column(String(50), nullable=False)
     profile_img = Column(String(250), nullable=True)
-    
-class Products(Base):
-    __tablename__ = "products"
-    id = Column(Integer, primary_key=True, index=True , autoincrement=True)
-    product_name = Column(String(50),  )
-    product_price = Column(String(50))
-    product_brand = Column(String(50),)
-    product_company = Column(String(50), )
-    category_id = Column(Integer, ForeignKey("product_category.category_id"), nullable=False)
-    thumbnail_image = Column(String(50))
-    category = relationship("Category", backref="products")
-    
-    
-# class Category(Base):
-#     __tablename__ = 'product_category'
-#     category_id = Column(Integer, primary_key=True, index=True, nullable = True)
-#     category_name = Column(String, nullable=False)
-#     parent_id = Column(Integer, ForeignKey('product_category.category_id', ondelete="CASCADE"), nullable=True)  
 
 class Category(Base):
     __tablename__ = 'product_category'
-    category_id = Column(Integer, primary_key=True, nullable=False, index=True)
+    category_id = Column(Integer, primary_key=True, index=True)
     category_name = Column(String, nullable=False)
     parent_id = Column(Integer, ForeignKey('product_category.category_id', ondelete="CASCADE"), nullable=True)
 
@@ -50,3 +96,24 @@ class Category(Base):
         backref=backref("parent", remote_side=[category_id]),
         cascade="all, delete-orphan"
     )
+
+class Products(Base):
+    __tablename__ = "products"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    product_name = Column(String(50))
+    product_price = Column(Float)
+    product_brand = Column(String(50))
+    product_company = Column(String(50))
+    category_id = Column(Integer, ForeignKey("product_category.category_id"), nullable=False)
+    thumbnail_image = Column(String(250))
+
+    category = relationship("Category", backref="products")
+    images = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
+
+class ProductImage(Base):
+    __tablename__ = "product_images"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    image_name = Column(String(250))
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+
+    product = relationship("Products", back_populates="images")
