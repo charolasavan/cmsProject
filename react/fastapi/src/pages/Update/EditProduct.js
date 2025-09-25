@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react'
-import { data, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import api from '../../api'
 import Swal from 'sweetalert2';
-
-
+import { IoCloseOutline } from "react-icons/io5";
 
 const EditProduct = () => {
     const { id } = useParams()
@@ -18,11 +17,14 @@ const EditProduct = () => {
         product_company: '',
         category_id: '',
         thumbnail_image: null,
-        image_name: []
+        images: []
     });
     const [categories, setCategories] = useState([]);
+    const [formError, setFormError] = useState([])
+
     // Fetch product data
     const fetchProducts = async () => {
+
         try {
             const res = await api.get(`/products/${id}`);
             setValue({
@@ -32,10 +34,9 @@ const EditProduct = () => {
                 product_company: res.data[0].product_company,
                 category_id: res.data[0].category_id,
                 thumbnail_image: res.data[0].thumbnail_image,
-                image_name: res.data[0].images,
+                images: res.data[0].images,
             });
         }
-
         catch (error) {
             Swal.fire({
                 icon: "error",
@@ -45,14 +46,12 @@ const EditProduct = () => {
         }
     };
 
-
     // Fetch product categories
     const fetchCategories = async () => {
         try {
             const { data } = await api.get('/category/');
             setCategories(data);
         }
-
         catch (error) {
             Swal.fire({
                 icon: "error",
@@ -64,10 +63,7 @@ const EditProduct = () => {
 
     // UseEffect to fetch product and categories
     useEffect(() => {
-
-
         // console.log(value)
-
         fetchProducts();
         fetchCategories();
     }, [id]);
@@ -79,13 +75,23 @@ const EditProduct = () => {
                 ...prev,
                 [e.target.name]: e.target.files[0],
             }));
-        } else {
+        }
+        else if (e.target.name === 'images') {
+            const newFiles = Array.from(e.target.files);
+            setValue((prev) => ({
+                ...prev,
+                images: [...prev.images, ...newFiles],
+            }));
+        }
+        else {
             setValue((prev) => ({
                 ...prev,
                 [e.target.name]: e.target.value,
             }));
         }
     };
+
+
     const handleDelete = async (id) => {
         const result = await Swal.fire({
             title: "Are you sure?",
@@ -116,7 +122,6 @@ const EditProduct = () => {
             }
         }
     };
-
     const renderOptions = (items, depth = 0) =>
         items.flatMap(({ category_id, category_name, children = [] }) => [
             <option key={category_id} value={category_id}>
@@ -126,47 +131,76 @@ const EditProduct = () => {
         ]);
 
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const addProductData = new FormData();
-        addProductData.append('product_name', value.product_name);
-        addProductData.append('product_price', value.product_price);
-        addProductData.append('product_brand', value.product_brand);
-        addProductData.append('product_company', value.product_company);
-        addProductData.append('category_id', value.category_id);
-        addProductData.append('thumbnail_image', value.thumbnail_image);
+        const validation = {}
+        if (!value.product_name?.trim()) {
+            validation.product_name = "Name Is required !!!"
+        }
+        if (!value.product_price) {
+            validation.product_price = "price Is required !!!"
+        }
+        if (!value.product_brand?.trim()) {
+            validation.product_brand = "Product Brand Is required !!!"
+        }
+        if (!value.product_company?.trim()) {
+            validation.product_company = "Company Name Is required !!!"
+        }
+        if (!value.category_id) {
+            validation.category_id = "Category Is required !!!"
+        }
+        if (!value.thumbnail_image) {
+            validation.thumbnail_image = "Thumbnail Image Is required !!!"
+        }
+        if (!value.images) {
+            validation.images = "Product Images Is required !!!"
+        }
 
-        // console.log(addProductData)
-        try {
-            api.put("/products/" + id, addProductData)
-            // alert("Product Updated Successfully!!!")
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 1000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
+        setFormError(validation)
+        if (Object.keys(validation).length === 0) {
+            const formData = new FormData();
+            formData.append('product_name', value.product_name.trim());
+            formData.append('product_price', value.product_price);
+            formData.append('product_brand', value.product_brand.trim());
+            formData.append('product_company', value.product_company.trim());
+            formData.append('category_id', value.category_id);
+            if (value.thumbnail_image instanceof File) {
+                formData.append('thumbnail_image', value.thumbnail_image);
+            }
+            value.images.forEach((img) => {
+                if (img instanceof File) {
+                    formData.append('images', img);
                 }
             });
-            Toast.fire({
-                icon: "success",
-                title: "Update Data is successfully"
-            });
-            navigate('/products')
-            // console.log(response)
+
+            try {
+                await api.put(`/products/${id}/`, formData);
+                await fetchProducts();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Product updated successfully',
+                    timer: 1500,
+                    showConfirmButton: false,
+                });
+
+                navigate('/products');
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: error?.response?.data?.detail || error.message || 'Failed to update product',
+                });
+            }
         }
-        catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Faild",
-                text: error?.response?.data?.detail || error.message || "Faild To Update Iteam"
-            });
-        }
-    }
+
+
+    };
+
+
+
     return (
         <>
             <div className='m-3'>
@@ -178,32 +212,34 @@ const EditProduct = () => {
                         name="category_id"
                         value={value.category_id}
                         onChange={handleChange}
-                        required
+
                     >
                         <option value="" disabled>Select Category</option>
                         {renderOptions(categories)}
                     </Form.Select>
                     <Form.Group className="mb-3">
                         <Form.Label>Product Name</Form.Label>
-                        <Form.Control type="text" placeholder="Enter Name" name='product_name' value={value.product_name} onChange={handleChange} required />
+                        <Form.Control type="text" placeholder="Enter Name" name='product_name' value={value.product_name} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.product_name}</span>}
 
                     </Form.Group>
 
                     <Form.Group className="mb-3" >
                         <Form.Label>Product Price</Form.Label>
-                        <Form.Control type="number" placeholder="Enter Price" name='product_price' value={value.product_price} onChange={handleChange} required />
-
+                        <Form.Control type="number" placeholder="Enter Price" name='product_price' value={value.product_price} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.product_price}</span>}
                     </Form.Group>
 
                     <Form.Group className="mb-3" >
                         <Form.Label>Product Brand</Form.Label>
-                        <Form.Control type="text" placeholder="Enter Brand" name='product_brand' value={value.product_brand} onChange={handleChange} required />
-
+                        <Form.Control type="text" placeholder="Enter Brand" name='product_brand' value={value.product_brand} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.product_brand}</span>}
                     </Form.Group>
 
                     <Form.Group className="mb-3" >
                         <Form.Label>Product Company</Form.Label>
-                        <Form.Control type="text" placeholder="Enter Company" name='product_company' value={value.product_company} onChange={handleChange} required />
+                        <Form.Control type="text" placeholder="Enter Company" name='product_company' value={value.product_company} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.product_company}</span>}
                     </Form.Group>
 
                     <Form.Group className="mb-3">
@@ -227,6 +263,7 @@ const EditProduct = () => {
                                 onChange={handleChange}
 
                             />
+                            {formError && <span className='validationError'>{formError.thumbnail_image}</span>}
                         </Form.Group>
                     </Form.Group>
 
@@ -235,27 +272,35 @@ const EditProduct = () => {
                             <Form.Label>Product Image</Form.Label>
                             <Form.Group className="mb-3">
                                 <div className='image_view mb-3'>
-                                    {value.image_name.map((name, index) => {
+                                    {value.images.map((name, index) => {
+                                        const isFile = name instanceof File || name.images instanceof File;
+                                        const imgSrc = isFile
+                                            ? URL.createObjectURL(name instanceof File ? name : name.images)
+                                            : `http://localhost:8000${name.image_name}`
+
                                         return (
-                                            <div key={index} className='main-image-layout' >
+                                            <div key={index} className='main-image-layout'>
                                                 <img
                                                     className='product_image'
-                                                    src={`http://localhost:8000${name.image_name}`}
+                                                    src={imgSrc}
                                                     alt='productImage'
-                                                    height={80}
+                                                    height={100}
                                                     width={100}
                                                 />
                                                 <div className='w-100 text-center'>
-                                                    <Button variant='danger'
-                                                        onClick={() => {
-                                                            handleDelete(name.id)
-                                                        }}
-                                                    >Delete</Button>
+
+                                                    <Button variant='danger' onClick={() => handleDelete(name.id)}>
+                                                        {/* <IoCloseOutline /> */}
+                                                        Delete
+                                                    </Button>
+
                                                 </div>
                                             </div>
-                                        )
+                                        );
                                     })}
+
                                 </div>
+                                {formError && <span className='validationError'>{formError.images}</span>}
                             </Form.Group>
                         </Form.Group>
                         <Form.Group className="mb-3">
@@ -263,7 +308,7 @@ const EditProduct = () => {
                             <Form.Group className="mb-3">
                                 <Form.Control
                                     type="file"
-                                    name="image_name"
+                                    name="images"
                                     accept="image/*"
                                     onChange={handleChange}
                                     multiple

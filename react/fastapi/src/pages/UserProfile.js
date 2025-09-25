@@ -5,6 +5,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 function UserProfile() {
   const [userData, setUserData] = useState({
+    // id: null,
     user_name: '',
     user_password: '',
     email_id: '',
@@ -18,17 +19,14 @@ function UserProfile() {
     country: '',
     profile_img: '',
   });
-  // console.log(userData)
+
   const getUserLoginData = async () => {
     const userIs = localStorage.getItem('user');
     const newUser = JSON.parse(userIs);
-
-    setUserData(newUser);
-
-    // Now using newUser.id instead of userData.id (which is not yet updated)
     try {
       const response = await api.get(`/users/${newUser.id}`);
-      console.log(response.data);
+      setUserData(response.data)
+
     } catch (error) {
       console.error(error);
     }
@@ -46,7 +44,6 @@ function UserProfile() {
         <Card.Header className="bg-gradient text-black text-center py-4" >
           <h3 className="mb-0">User Profile</h3>
         </Card.Header>
-
         <Card.Body className="p-4">
           <Link to={`/edituser/${userData.id}`}>
             <Button variant='btn btn-success'>update</Button>

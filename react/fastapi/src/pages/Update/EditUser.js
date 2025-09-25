@@ -9,7 +9,6 @@ import Swal from 'sweetalert2'
 function EditUser() {
     const { id } = useParams()
     const [isPasswordShown, setIsPasswordShown] = useState(false);
-
     const [userData, setUserData] = useState({
         user_name: '',
         user_password: '',
@@ -25,6 +24,7 @@ function EditUser() {
         profile_img: '',
     });
 
+    const [formError, setFormError] = useState([])
     const navigate = useNavigate();
 
     // Fetch User from backend
@@ -50,58 +50,101 @@ function EditUser() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const validation = {}
 
-        const addUserData = new FormData();
-        addUserData.append('user_name', userData.user_name);
-        addUserData.append('user_password', userData.user_password);
-        addUserData.append('email_id', userData.email_id);
-        addUserData.append('phone_number', userData.phone_number);
-        addUserData.append('dob', userData.dob);
-        addUserData.append('gender', userData.gender);
-        addUserData.append('address', userData.address);
-        addUserData.append('city', userData.city);
-        addUserData.append('state', userData.state);
-        addUserData.append('zip_code', userData.zip_code);
-        addUserData.append('country', userData.country);
-        // addUserData.append('profile_img', userData.profile_img);
-        if (userData.profile_img instanceof File) {
-            addUserData.append('profile_img', userData.profile_img);
+        if (!userData.user_name?.trim()) {
+            validation.user_name = "UserName is Required!!!"
         }
-
-
-        try {
-            await api.put(`/users/${id}`, addUserData);
-            const Toast = Swal.mixin({
-                toast: true,
-                position: "top-end",
-                showConfirmButton: false,
-                timer: 1000,
-                timerProgressBar: true,
-                didOpen: (toast) => {
-                    toast.onmouseenter = Swal.stopTimer;
-                    toast.onmouseleave = Swal.resumeTimer;
-                }
-            });
-            Toast.fire({
-                icon: "success",
-                title: "Update Data is successfully"
-            });
-            navigate(-1);
-
+        if (!userData.user_password?.trim()) {
+            validation.user_password = "Password is Required!!!"
         }
-        catch (error) {
-            // console.error('Upload error:', error);
-            // alert('Failed to upload product');
-
-            Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                text: error.response?.data?.detail || "Failed to add User.",
-            });
-
-
+        if (!userData.email_id?.trim()) {
+            validation.email_id = "EmailID is Required!!!"
         }
-    };
+        if (!userData.phone_number?.trim()) {
+            validation.phone_number = "PhoneNumber is Required!!!"
+        }
+        else if (userData.phone_number.length != 10 && userData.phone_number) {
+            validation.phone_number = "Please Enter Valid Number!!!"
+        }
+        if (!userData.dob?.trim()) {
+            validation.dob = "DOB is Required!!!"
+        }
+        if (!userData.gender?.trim()) {
+            validation.gender = "Gender is Required!!!"
+        }
+        if (!userData.address?.trim()) {
+            validation.address = "Address is Required!!!"
+        }
+        if (!userData.city?.trim()) {
+            validation.city = "City is Required!!!"
+        }
+        if (!userData.state?.trim()) {
+            validation.state = "State is Required!!!"
+        }
+        if (!userData.zip_code?.trim()) {
+            validation.zip_code = "ZipCode is Required!!!"
+        }
+        if (!userData.country?.trim()) {
+            validation.country = "Country is Required!!!"
+        }
+        if (!userData.profile_img) {
+            validation.profile_img = "ProfileImage is Required!!!"
+        }
+        setFormError(validation)
+        if (Object.keys(validation).length === 0) {
+            const addUserData = new FormData();
+            addUserData.append('user_name', userData.user_name.trim());
+            addUserData.append('user_password', userData.user_password.trim());
+            addUserData.append('email_id', userData.email_id.trim());
+            addUserData.append('phone_number', userData.phone_number.trim());
+            addUserData.append('dob', userData.dob.trim());
+            addUserData.append('gender', userData.gender.trim());
+            addUserData.append('address', userData.address.trim());
+            addUserData.append('city', userData.city.trim());
+            addUserData.append('state', userData.state.trim());
+            addUserData.append('zip_code', userData.zip_code.trim());
+            addUserData.append('country', userData.country.trim());
+            if (userData.profile_img instanceof File) {
+                addUserData.append('profile_img', userData.profile_img);
+            }
+
+
+            try {
+                await api.put(`/users/${id}`, addUserData);
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 1000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.onmouseenter = Swal.stopTimer;
+                        toast.onmouseleave = Swal.resumeTimer;
+                    }
+                });
+                Toast.fire({
+                    icon: "success",
+                    title: "Update Data is successfully"
+                });
+                navigate(-1);
+
+            }
+            catch (error) {
+                // console.error('Upload error:', error);
+                // alert('Failed to upload product');
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: error.response?.data?.detail || "Failed to add User.",
+                });
+
+
+            }
+        };
+    }
+
 
     useEffect(() => {
         const fetchUserDetail = async () => {

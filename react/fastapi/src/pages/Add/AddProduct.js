@@ -78,11 +78,11 @@ function AddProduct() {
     if (Object.keys(validation).length === 0) {
       // console.log(validation)
       const addProductData = new FormData();
-      addProductData.append('product_name', formData.product_name);
-      addProductData.append('product_price', formData.product_price);
-      addProductData.append('product_brand', formData.product_brand);
-      addProductData.append('product_company', formData.product_company);
-      addProductData.append('category_id', formData.category_id);
+      addProductData.append('product_name', formData.product_name.trim());
+      addProductData.append('product_price', formData.product_price.trim());
+      addProductData.append('product_brand', formData.product_brand.trim());
+      addProductData.append('product_company', formData.product_company.trim());
+      addProductData.append('category_id', formData.category_id.trim());
       addProductData.append('thumbnail_image', formData.thumbnail_image);
       productImages.forEach(image => {
         addProductData.append('images', image)
@@ -232,8 +232,8 @@ function AddProduct() {
             accept="image/*"
             onChange={handleImages}
             multiple
-            required
           />
+          {formError.productImages && <span className='validationError'>{formError.productImages}</span>}
         </Form.Group>
 
         <div className="d-flex">

@@ -7,8 +7,8 @@ import Swal from 'sweetalert2';
 
 function CategoryList() {
   const [categories, setCategories] = useState([]); // setCategory for select Product
-  const [form, setForm] = useState({ category_name: '', parent_id: 0 });   // setFormCategory
-
+  const [form, setForm] = useState({ category_name: '', parent_id: 0 });
+  const [formError, setFormError] = useState([])
   // Load Then Fetch all categories
   useEffect(() => {
     fetchCategories();
@@ -32,43 +32,57 @@ function CategoryList() {
   };
 
 
-  // input change then call it function and store change value
-  const handleChange = ({ target: { name, value } }) => {
-    setForm({ ...form, [name]: name === 'parent_id' ? parseInt(value) : value });
+
+  const handleChange = (e) => {
+    e.preventDefault();
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+
+
   };
 
 
   // categories submit or add
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const validation = {}
+    if (!form.category_name?.trim()) {
+      validation.category_name = "Category is Required !!!"
+    }
+    setFormError(validation)
+    if (Object.keys(validation).length === 0) {
 
-    try {
-      await api.post('/category/', form);
-      setForm({ category_name: '', parent_id: 0 });
-      fetchCategories();
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 1000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Category Create successfully"
-      });
+      try {
+        await api.post('/category/', form);
+        setForm({ category_name: '', parent_id: 0 });
+        fetchCategories();
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Category Create successfully"
+        });
+      }
+      catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: error.response?.data?.detail || "Failed to Fetch Category.",
+        });
+      }
     }
-    catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: error.response?.data?.detail || "Failed to Fetch Category.",
-      });
-    }
+
   };
 
   // delete categories
@@ -161,10 +175,10 @@ function CategoryList() {
             value={form.category_name}
             onChange={handleChange}
             placeholder="Enter Category Name"
-            required
           />
+          {formError && <span className='validationError'>{formError.category_name}</span>}
         </Form.Group>
-        <Button type="submit" variant='primary'>Add Category</Button>
+        <Button type="submit" variant='primary'>Add</Button>
       </Form>
 
       {/* display category in table */}

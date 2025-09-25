@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 const EditCategory = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  const [formError, setFormError] = useState([])
   const [categories, setCategories] = useState([]);
   const [value, setValue] = useState({
     category_name: '',
@@ -57,18 +57,6 @@ const EditCategory = () => {
     fetchCategoryById()
   }, [id]);
 
-  // Fetch all categories for the parent category dropdown
-  // useEffect(() => {
-  //   const fetchCategory = async () => {
-  //     try {
-  //       const response = await api.get('/category/');
-  //       setCategories(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching categories:", error);
-  //     }
-  //   };
-  //   fetchCategory();
-  // }, []);
 
   // Handle input changes
   const handleChange = (e) => {
@@ -82,32 +70,40 @@ const EditCategory = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await api.put(`/category/${id}`, value);
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 1000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      });
-      Toast.fire({
-        icon: "success",
-        title: "Update Data is successfully"
-      });
-      navigate("/categories"); // Navigate to categories list after update
+    const validation = {}
+    if (!value.category_name?.trim()) {
+      validation.category_name = "Category Required !!!"
     }
-    catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Faild",
-        text: error?.response?.data?.detail || error.message || "Faild To Update Category"
-      });
+    setFormError(validation)
+    if (Object.keys(validation).length === 0) {
+      try {
+        await api.put(`/category/${id}`, value);
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 1000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Update Data is successfully"
+        });
+        navigate("/categories"); // Navigate to categories list after update
+      }
+      catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Faild",
+          text: error?.response?.data?.detail || error.message || "Faild To Update Category"
+        });
+      }
     }
+
   };
 
   // Recursive function to display categories with children
@@ -151,8 +147,8 @@ const EditCategory = () => {
             name="category_name"
             value={value.category_name}
             onChange={handleChange}
-            required
           />
+          {formError && <span className='validationError'>{formError.category_name}</span>}
         </Form.Group>
 
         {/* Update button */}

@@ -66,6 +66,7 @@ async def get_category(category_id: int, db: Session = Depends(get_db)):
 @router.put("/{category_id}", response_model=CategoryBase)
 async def update_category(category_id: int, category: CategoryBase, db: Session = Depends(get_db)):
     db_category = db.query(models.Category).filter(models.Category.category_id == category_id).first()
+    existing = db.query(models.Category).filter(models.Category.category_name == category.category_name).first()
     if not db_category:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
 
@@ -76,7 +77,13 @@ async def update_category(category_id: int, category: CategoryBase, db: Session 
         parent = db.query(models.Category).filter(models.Category.category_id == category.parent_id).first()
         if not parent:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Parent category not found")
-
+    
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,   
+            detail="Category with this name already exists."
+        )
+        
     # if parent id is 0 then update is null 
     for key, value in category.dict().items():
         if key == "parent_id" and value == 0:
