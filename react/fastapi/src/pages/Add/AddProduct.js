@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Button, Col, Form, Row } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api'
 import Swal from 'sweetalert2';
@@ -8,9 +8,13 @@ function AddProduct() {
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
     product_name: '',
-    product_price: '',
+    regular_price: '',
+    selling_price: '',
+    product_quantity: '',
     product_brand: '',
     product_company: '',
+    product_status: '',
+    product_description: '',
     category_id: '',
     thumbnail_image: '',
   });
@@ -48,7 +52,7 @@ function AddProduct() {
     e.preventDefault();
 
     const validation = {}
-    if (!formData.category_id?.trim()) {
+    if (!formData.category_id) {
       validation.category_id = "Category  is required"
     }
 
@@ -56,10 +60,16 @@ function AddProduct() {
       validation.product_name = "Product name is required"
     }
 
-    if (!formData.product_price?.trim()) {
-      validation.product_price = "Product Price is required"
+    if (!formData.regular_price) {
+      validation.regular_price = "Regular Price is required"
     }
 
+    if (!formData.selling_price) {
+      validation.selling_price = "Selling Price is required"
+    }
+    if (!formData.product_quantity) {
+      validation.product_quantity = "Quantity is required"
+    }
 
     if (!formData.product_brand?.trim()) {
       validation.product_brand = "Product brand is required"
@@ -67,6 +77,14 @@ function AddProduct() {
 
     if (!formData.product_company?.trim()) {
       validation.product_company = "Product Company is required"
+    }
+
+    if (!formData.product_status?.trim()) {
+      validation.product_status = "Product Status is required"
+    }
+
+    if (!formData.product_description?.trim()) {
+      validation.product_description = "Product Description is required"
     }
 
     if (!formData.thumbnail_image) {
@@ -79,10 +97,14 @@ function AddProduct() {
       // console.log(validation)
       const addProductData = new FormData();
       addProductData.append('product_name', formData.product_name.trim());
-      addProductData.append('product_price', formData.product_price.trim());
+      addProductData.append('regular_price', formData.regular_price.trim());
+      addProductData.append('selling_price', formData.selling_price.trim());
+      addProductData.append('product_quantity', formData.product_quantity);
       addProductData.append('product_brand', formData.product_brand.trim());
       addProductData.append('product_company', formData.product_company.trim());
-      addProductData.append('category_id', formData.category_id.trim());
+      addProductData.append('product_status', formData.product_status.trim());
+      addProductData.append('product_description', formData.product_description.trim());
+      addProductData.append('category_id', formData.category_id);
       addProductData.append('thumbnail_image', formData.thumbnail_image);
       productImages.forEach(image => {
         addProductData.append('images', image)
@@ -145,96 +167,162 @@ function AddProduct() {
     <div className="m-3">
       <h3>Add Product</h3>
       <Form onSubmit={handleSubmit} encType='multipart/form-data'>
-        <Form.Group className='mb-3'>
-          <Form.Label>Product Category</Form.Label>
-          <Form.Select
-            name="category_id"
-            value={formData.category_id}
-            onChange={handleChange}
-          // required
-          >
-            <option value="" disabled>
-              Select Category
-            </option>
-            {renderOptions(categories)}
-          </Form.Select>
-          {formError.category_id && <span className='validationError'>{formError.category_id}</span>}
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Product Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter Name"
-            name="product_name"
-            value={formData.product_name}
-            onChange={handleChange}
-          // required
-          />
-          {formError.product_name && <span className='validationError'>{formError.product_name}</span>}
-        </Form.Group>
+        <Row>
+          <Col>
+            <Form.Group className='mb-3'>
+              <Form.Label>Product Category</Form.Label>
+              <Form.Select
+                name="category_id"
+                value={formData.category_id}
+                onChange={handleChange}
+              // required
+              >
+                <option value="" disabled>
+                  Select Category
+                </option>
+                {renderOptions(categories)}
+              </Form.Select>
+              {formError.category_id && <span className='validationError'>{formError.category_id}</span>}
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Name"
+                name="product_name"
+                value={formData.product_name}
+                onChange={handleChange}
+              // required
+              />
+              {formError.product_name && <span className='validationError'>{formError.product_name}</span>}
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Regular Price</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Regular Price"
+                name="regular_price"
+                value={formData.regular_price}
+                onChange={handleChange}
+              // required
+              />
+              {formError.regular_price && <span className='validationError'>{formError.regular_price}</span>}
+            </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label>Product Price</Form.Label>
-          <Form.Control
-            type="number"
-            placeholder="Enter Price"
-            name="product_price"
-            value={formData.product_price}
-            onChange={handleChange}
-          // required
-          />
-          {formError.product_price && <span className='validationError'>{formError.product_price}</span>}
-        </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Selling Price</Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Selling Price"
+                name="selling_price"
+                value={formData.selling_price}
+                onChange={handleChange}
+              // required
+              />
+              {formError.selling_price && <span className='validationError'>{formError.selling_price}</span>}
+            </Form.Group>
 
-        <Form.Group className="mb-3">
-          <Form.Label>Product Brand</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter Brand"
-            name="product_brand"
-            value={formData.product_brand}
-            onChange={handleChange}
-          // required
-          />
-          {formError.product_brand && <span className='validationError'>{formError.product_brand}</span>}
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Product Company</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter Company"
-            name="product_company"
-            value={formData.product_company}
-            onChange={handleChange}
-          // required
-          />
-          {formError.product_company && <span className='validationError'>{formError.product_company}</span>}
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Thumbnail Image</Form.Label>
-          <Form.Control
-            type="file"
-            name="thumbnail_image"
-            accept="image/*"
-            onChange={handleChange}
-          // required
-          />
-          {formError.thumbnail_image && <span className='validationError'>{formError.thumbnail_image}</span>}
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Product Image</Form.Label>
-          <Form.Control
-            type="file"
-            name="images"
-            accept="image/*"
-            onChange={handleImages}
-            multiple
-          />
-          {formError.productImages && <span className='validationError'>{formError.productImages}</span>}
-        </Form.Group>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Quantity / Units </Form.Label>
+              <Form.Control
+                type="number"
+                placeholder="Quantity"
+                name="product_quantity"
+                value={formData.product_quantity}
+                onChange={handleChange}
+              // required
+              />
+              {formError.product_quantity && <span className='validationError'>{formError.product_quantity}</span>}
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Brand</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Brand"
+                name="product_brand"
+                value={formData.product_brand}
+                onChange={handleChange}
+              // required
+              />
+              {formError.product_brand && <span className='validationError'>{formError.product_brand}</span>}
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Company</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Enter Company"
+                name="product_company"
+                value={formData.product_company}
+                onChange={handleChange}
+              // required
+              />
+              {formError.product_company && <span className='validationError'>{formError.product_company}</span>}
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className='mb-3'>
+              <Form.Label>Product Status</Form.Label>
+              <Form.Select
+                name="product_status"
+                value={formData.product_status}
+                onChange={handleChange}
+              >
+                <option value="" disabled>Select</option>
+                <option>Active</option>
+                <option>DeActive</option>
+              </Form.Select>
+              {formError.product_status && <span className='validationError'>{formError.product_status}</span>}
+            </Form.Group>
+          </Col>
+        </Row>
+        <Row>
+          <Form.Group className="mb-3" >
+            <Form.Label>Product Description</Form.Label>
+            <Form.Control as="textarea" name='product_description' rows={3} value={formData.product_description} onChange={handleChange} style={{ resize: 'none' }} />
+          </Form.Group>
+        </Row>
+        <Row>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Thumbnail Image</Form.Label>
+              <Form.Control
+                type="file"
+                name="thumbnail_image"
+                accept="image/*"
+                onChange={handleChange}
+              // required
+              />
+              {formError.thumbnail_image && <span className='validationError'>{formError.thumbnail_image}</span>}
+            </Form.Group>
+          </Col>
+          <Col>
+            <Form.Group className="mb-3">
+              <Form.Label>Product Image</Form.Label>
+              <Form.Control
+                type="file"
+                name="images"
+                accept="image/*"
+                onChange={handleImages}
+                multiple
+              />
+              {formError.productImages && <span className='validationError'>{formError.productImages}</span>}
+            </Form.Group>
+          </Col>
+        </Row>
 
         <div className="d-flex">
           <Button className="me-2" variant="primary" type="submit">

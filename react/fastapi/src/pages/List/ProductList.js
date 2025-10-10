@@ -1,14 +1,14 @@
-import Button from 'react-bootstrap/Button';
 import React, { useState, useEffect } from 'react';
-import Table from 'react-bootstrap/Table';
+// import Table from 'react-bootstrap/Table';
 import 'swiper/css';
 import api from '../../api';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Swal from 'sweetalert2';
-import Slider from "react-slick";
+// import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Button, Form, Table } from 'react-bootstrap';
 
 function ProductList() {
   const [productData, setProductData] = useState([])
@@ -93,9 +93,12 @@ function ProductList() {
             <tr>
               <th>id</th>
               <th>Product Name</th>
-              <th>Product Price</th>
+              <th>Quantity / Units</th>
+              <th>Regular price</th>
+              <th>Selling price</th>
               <th>Product Brand</th>
               <th>Product Company</th>
+              <th>Product Status</th>
               <th>Product Category</th>
               <th>Thumbnail Images</th>
               {/* <th>Images</th> */}
@@ -109,9 +112,26 @@ function ProductList() {
                 <tr key={`${data.id}-${data.product_name}`}>
                   <td>{data.id}</td>
                   <td>{data.product_name}</td>
-                  <td>{data.product_price}</td>
+                  <td>{data.product_quantity}</td>
+                  <td>{data.regular_price}</td>
+                  <td>{data.selling_price}</td>
                   <td>{data.product_brand}</td>
                   <td>{data.product_company}</td>
+                  <td>
+                    {
+                      data.product_status == "Active" ?
+                        (
+                          <p style={{
+                            color: "green",
+                          }}>Active</p>
+                        ) :
+                        (
+                          <p style={{
+                            color: "red"
+                          }}>DeActive</p>
+                        )
+                    }
+                  </td>
                   <td>{data.category_id}</td>
                   <td>
                     <img

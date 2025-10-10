@@ -11,11 +11,16 @@ class ProductImageBase(BaseModel):
 
 class ProductBase(BaseModel):
     id: int   
-    product_name: str
-    product_price: float
-    product_brand: str
-    product_company: str
-    category_id: Optional[int] = None 
+    product_name: Optional[str] = None
+    product_quantity: Optional[int]
+    regular_price: Optional[int]
+    selling_price: Optional[int]
+    product_brand: Optional[str]
+    product_company: Optional[str]
+    product_status: Optional[str]
+    product_description: Optional[str]
+    # category_id: Optional[List[int]] = []
+    category_id : Optional[int]
     thumbnail_image: Optional[str] = None
     images: Optional[List[ProductImageBase] ] = None
 

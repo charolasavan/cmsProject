@@ -106,6 +106,7 @@ import EditCategory from './pages/Update/EditCategory';
 import LoginPage from './pages/LoginPage';
 import UserProfile from './pages/UserProfile';
 
+import OrderList from './pages/List/OrderList';
 import PrivateRoute from './components/PrivateRoute';
 
 function App() {
@@ -196,6 +197,13 @@ function App() {
                 <Route path="/editcategory/:id" element={
                   <PrivateRoute isLoggedIn={isLoggedIn}>
                     <EditCategory />
+                  </PrivateRoute>
+                } />
+
+
+                <Route path="/orders" element={
+                  <PrivateRoute isLoggedIn={isLoggedIn}>
+                    <OrderList />
                   </PrivateRoute>
                 } />
 

@@ -49,7 +49,6 @@ function EditUser() {
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         const validation = {}
 
         if (!userData.user_name?.trim()) {
@@ -61,16 +60,16 @@ function EditUser() {
         if (!userData.email_id?.trim()) {
             validation.email_id = "EmailID is Required!!!"
         }
-        if (!userData.phone_number?.trim()) {
+        if (!userData.phone_number) {
             validation.phone_number = "PhoneNumber is Required!!!"
         }
-        else if (userData.phone_number.length != 10 && userData.phone_number) {
-            validation.phone_number = "Please Enter Valid Number!!!"
-        }
-        if (!userData.dob?.trim()) {
+        // else if (userData.phone_number.length !== 10) {
+        //     validation.phone_number = "Please Enter Valid Number!!!"
+        // }
+        if (!userData.dob) {
             validation.dob = "DOB is Required!!!"
         }
-        if (!userData.gender?.trim()) {
+        if (!userData.gender) {
             validation.gender = "Gender is Required!!!"
         }
         if (!userData.address?.trim()) {
@@ -82,7 +81,7 @@ function EditUser() {
         if (!userData.state?.trim()) {
             validation.state = "State is Required!!!"
         }
-        if (!userData.zip_code?.trim()) {
+        if (!userData.zip_code) {
             validation.zip_code = "ZipCode is Required!!!"
         }
         if (!userData.country?.trim()) {
@@ -92,26 +91,47 @@ function EditUser() {
             validation.profile_img = "ProfileImage is Required!!!"
         }
         setFormError(validation)
+
+
         if (Object.keys(validation).length === 0) {
+            // console.log("JO")
             const addUserData = new FormData();
-            addUserData.append('user_name', userData.user_name.trim());
-            addUserData.append('user_password', userData.user_password.trim());
-            addUserData.append('email_id', userData.email_id.trim());
-            addUserData.append('phone_number', userData.phone_number.trim());
-            addUserData.append('dob', userData.dob.trim());
-            addUserData.append('gender', userData.gender.trim());
-            addUserData.append('address', userData.address.trim());
-            addUserData.append('city', userData.city.trim());
-            addUserData.append('state', userData.state.trim());
-            addUserData.append('zip_code', userData.zip_code.trim());
-            addUserData.append('country', userData.country.trim());
+            addUserData.append('user_name', userData.user_name);
+            addUserData.append('user_password', userData.user_password);
+            addUserData.append('email_id', userData.email_id);
+            addUserData.append('phone_number', userData.phone_number);
+            addUserData.append('dob', userData.dob);
+            addUserData.append('gender', userData.gender);
+            addUserData.append('address', userData.address);
+            addUserData.append('city', userData.city);
+            addUserData.append('state', userData.state);
+            addUserData.append('zip_code', userData.zip_code);
+            addUserData.append('country', userData.country);
             if (userData.profile_img instanceof File) {
                 addUserData.append('profile_img', userData.profile_img);
             }
-
+            // await api.put(`/users/${id}/`, addUserData);
+            // // console.log("Update")
+            // const Toast = Swal.mixin({
+            //     toast: true,
+            //     position: "top-end",
+            //     showConfirmButton: false,
+            //     timer: 1000,
+            //     timerProgressBar: true,
+            //     didOpen: (toast) => {
+            //         toast.onmouseenter = Swal.stopTimer;
+            //         toast.onmouseleave = Swal.resumeTimer;
+            //     }
+            // });
+            // Toast.fire({
+            //     icon: "success",
+            //     title: "Update Data is successfully"
+            // });
+            // navigate(-1);
 
             try {
-                await api.put(`/users/${id}`, addUserData);
+                await api.put(`/users/${id}/`, addUserData);
+                // console.log("Update")
                 const Toast = Swal.mixin({
                     toast: true,
                     position: "top-end",
@@ -191,6 +211,7 @@ function EditUser() {
                     <Col md={6}>
                         <Form.Label>Full Name</Form.Label>
                         <Form.Control type="text" name='user_name' value={userData.user_name} placeholder="Savan Charola" onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.user_name}</span>}
                     </Col>
                     <Col md={6}>
                         <Form.Label>Password</Form.Label>
@@ -216,6 +237,7 @@ function EditUser() {
                                 {isPasswordShown ? <MdVisibility /> : <MdVisibilityOff />}
                             </span>
                         </div>
+                        {formError && <span className='validationError'>{formError.user_password}</span>}
                     </Col>
 
                 </Row>
@@ -223,6 +245,7 @@ function EditUser() {
                     <Col md={6}>
                         <Form.Label>Email Address</Form.Label>
                         <Form.Control type="email" name='email_id' placeholder="savan@gmail.com" value={userData.email_id} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.email_id}</span>}
                     </Col>
                 </Row>
 
@@ -230,10 +253,12 @@ function EditUser() {
                     <Col md={6}>
                         <Form.Label>Phone Number</Form.Label>
                         <Form.Control type="tel" name='phone_number' placeholder="7862030297" value={userData.phone_number} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.phone_number}</span>}
                     </Col>
                     <Col md={3}>
                         <Form.Label>Date of Birth</Form.Label>
                         <Form.Control type="date" name='dob' value={userData.dob} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.dob}</span>}
                     </Col>
                     <Col md={3}>
                         <Form.Label>Gender</Form.Label>
@@ -243,6 +268,7 @@ function EditUser() {
                             <option>Female</option>
                             <option>Other</option>
                         </Form.Select>
+                        {formError && <span className='validationError'>{formError.gender}</span>}
                     </Col>
                 </Row>
 
@@ -253,26 +279,31 @@ function EditUser() {
                     <Col md={12}>
                         <Form.Label>Street Address</Form.Label>
                         <Form.Control type="text" name='address' value={userData.address} placeholder="Kerala Morbi" onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.address}</span>}
                     </Col>
                 </Row>
                 <Row className="mb-3">
                     <Col md={4}>
                         <Form.Label>City</Form.Label>
                         <Form.Control type="text" name='city' placeholder="Morbi" value={userData.city} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.city}</span>}
                     </Col>
                     <Col md={4}>
                         <Form.Label>State</Form.Label>
                         <Form.Control type="text" name='state' placeholder="Gujrat" value={userData.state} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.state}</span>}
                     </Col>
                     <Col md={4}>
                         <Form.Label>Zip Code</Form.Label>
                         <Form.Control type="text" name='zip_code' placeholder="363641" value={userData.zip_code} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.zip_code}</span>}
                     </Col>
                 </Row>
                 <Row className="mb-3">
                     <Col md={6}>
                         <Form.Label>Country</Form.Label>
                         <Form.Control type="text" name='country' placeholder="India" value={userData.country} onChange={handleChange} />
+                        {formError && <span className='validationError'>{formError.country}</span>}
                     </Col>
                 </Row>
                 {/* Profile Picture */}
@@ -298,7 +329,7 @@ function EditUser() {
                         onChange={handleChange}
 
                     />
-
+                    {formError && <span className='validationError'>{formError.profile_img}</span>}
                 </Form.Group>
 
                 {/* Buttons */}

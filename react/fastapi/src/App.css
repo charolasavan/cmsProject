@@ -23,6 +23,8 @@ ul.dropdown-menu ul.dropdown-menu { margin-left: 10px; border-left: 2px dashed #
 
 a { text-decoration: none !important; color: white !important; }
 tr>td>img { max-width: 156px; }
+table tr td textarea { padding: 10px; }
+
 td,
 th { padding: 14px !important; vertical-align: middle !important; white-space: nowrap; }
 .profile_img { max-width: 150px; max-height: 80px; box-sizing: border-box; object-fit: cover; }

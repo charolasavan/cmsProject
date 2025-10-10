@@ -98,7 +98,7 @@ function AddUser() {
       addUserData.append('email_id', userData.email_id.trim());
       addUserData.append('phone_number', userData.phone_number.trim());
       addUserData.append('dob', userData.dob.trim());
-      addUserData.append('gender', userData.gender.trim());
+      addUserData.append('gender', userData.gender.toString().trim());
       addUserData.append('address', userData.address.trim());
       addUserData.append('city', userData.city.trim());
       addUserData.append('state', userData.state.trim());

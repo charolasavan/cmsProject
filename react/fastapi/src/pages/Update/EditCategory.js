@@ -131,11 +131,11 @@ const EditCategory = () => {
         <Form.Select
           className="form-select mb-3"
           onChange={handleChange}
-          value={value.parent_id || 0}  // Default to 0 if parent_id is null
+          value={value.parent_id || 0}
           name="parent_id"
         >
           <option value={0}>Parent Category</option>
-          {renderOptions(categories)} {/* Recursive category rendering */}
+          {renderOptions(categories)}
         </Form.Select>
 
         {/* Category name input */}

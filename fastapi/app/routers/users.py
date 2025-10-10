@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, date
 from typing import Optional
 from pathlib import Path
 import uuid
+from sqlalchemy import or_
 
 from app import models
 from app.schemas.user import UserBase
@@ -164,7 +165,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 # Update a user by ID
-@router.put("/{user_id}", response_model=UserBase)
+@router.put("/{user_id}/", response_model=UserBase)
 async def update_user(
     user_id : int,
     user_name: str = Form(...),
@@ -222,3 +223,41 @@ async def delete_user(user_id: int, db: Session = Depends(get_db)):
     db.delete(db_user)
     db.commit()
     return db_user
+
+
+
+# Seach Specific user
+@router.post("/getuser/")
+async def get_user(
+   user_name: Optional[str] = Form(None),
+    email_id: Optional[str] = Form(None),
+    phone_number: Optional[int] = Form(None),
+    dob: Optional[date] = Form(None),
+    gender: Optional[str] = Form(None),
+    address: Optional[str] = Form(None),
+    city: Optional[str] = Form(None),
+    state: Optional[str] = Form(None),
+    zip_code: Optional[int] = Form(None),
+    country: Optional[str] = Form(None),
+    db: Session = Depends(get_db)
+):
+    # return user_name
+    
+     search_user = db.query(models.User).filter(
+                or_(
+                    models.User.user_name == user_name,  
+                    models.User.email_id == email_id ,
+                    models.User.phone_number == phone_number ,
+                    models.User.dob == dob ,
+                    models.User.gender == gender ,
+                    models.User.address == address ,
+                    models.User.city == city ,
+                    models.User.state == state ,
+                    models.User.zip_code == zip_code ,
+                    models.User.country == country 
+                )
+            ).all()
+     if not search_user:
+         
+         return {"message":"User Not Found"}
+     return search_user
