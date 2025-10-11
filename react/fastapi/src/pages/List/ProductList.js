@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 // import Table from 'react-bootstrap/Table';
-import 'swiper/css';
+// import 'swiper/css';
 import api from '../../api';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -8,7 +8,8 @@ import Swal from 'sweetalert2';
 // import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { Button, Form, Table } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
+import '../../App.css'
 
 function ProductList() {
   const [productData, setProductData] = useState([])
@@ -121,18 +122,18 @@ function ProductList() {
                     {
                       data.product_status == "Active" ?
                         (
-                          <p style={{
-                            color: "green",
-                          }}>Active</p>
+                          <p className='active'>
+                            Active
+                          </p>
                         ) :
                         (
-                          <p style={{
-                            color: "red"
-                          }}>DeActive</p>
+                          <p className='deactive'>
+                            DeActive
+                          </p>
                         )
                     }
                   </td>
-                  <td>{data.category_id}</td>
+                  <td>{data.category.category_name}</td>
                   <td>
                     <img
                       className='thumbnail_img'

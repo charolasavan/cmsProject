@@ -29,7 +29,10 @@ def get_db():
 #  Get all products
 @router.get("/")
 def get_all_products(db: Session = Depends(get_db)):
-    products = db.query(models.Products).options(joinedload(models.Products.images)).all()
+    products = db.query(models.Products).options(
+        joinedload(models.Products.images),
+        joinedload(models.Products.category) 
+    ).all()
     # products = db.query(models.Products).all()
     return products
 

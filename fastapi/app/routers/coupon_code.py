@@ -5,6 +5,7 @@ from app.schemas.coupon_code import CouponCodeBase
 from app.database import SessionLocal
 from datetime import datetime, timedelta, date
 import uuid
+from typing import  Optional
 
 router = APIRouter(prefix="/coupons", tags=["Coupons"])
 
@@ -29,16 +30,34 @@ def generate_unique_coupon_code():
     return f"#{str(uuid.uuid4())[:6].upper()}"
 @router.post('/', response_model = CouponCodeBase)
 async def generate_coupons(
+  code : str = Form(None),
   discount_price : int = Form(...),
-  expire_days : int  =  Form(...),
+  expires_date : str  =  Form(...),
   is_active : bool = Form(...),
   usage_limit : int = Form(...),
 
   db : Session = Depends(get_db)  
 ):
-    code = generate_unique_coupon_code()
-    expire = datetime.now() + timedelta(expire_days)
-    db_coupons = models.CouponCode(
+    if code:
+
+        existing_coupon = db.query(models.CouponCode).filter(models.CouponCode.code == code).first()
+        if existing_coupon:
+            
+            return {"error": "Coupon code already exists"}
+    else:
+        code = generate_unique_coupon_code()
+
+    today = datetime.now().date()
+    try:
+        expire = datetime.strptime(expires_date, "%Y-%m-%d") 
+    except ValueError:
+        return {"error": "Invalid expiration date format. Please use YYYY-MM-DD."}
+    if expire.date() < today:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Date Must be Greate To Now")
+
+    else:
+        is_active = True
+        db_coupons = models.CouponCode(
         code  = code,
         discount_price = discount_price,
         expires_date = expire,
@@ -52,24 +71,66 @@ async def generate_coupons(
 
 
 # Get Coupon Code
-@router.get("/{code}/", response_model=CouponCodeBase)
-async def get_coupon_code(code: str, db: Session = Depends(get_db)):
-    get_coupon_code = db.query(models.CouponCode).filter(models.CouponCode.code == code).first()
+@router.get("/{id}", response_model=CouponCodeBase)
+async def get_coupon_code(id: int, db: Session = Depends(get_db)):
+    get_coupon_code = db.query(models.CouponCode).filter(models.CouponCode.id == id).first()
     if not get_coupon_code:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Coupon not found")
     
     return get_coupon_code 
 
-@router.delete('/{coupon_code}', response_model= CouponCodeBase)
+# Update Coupon Data
+@router.put("/{id}", response_model=CouponCodeBase)
+async def update_couponcode(
+    id : int,
+   code: Optional[str] = Form(None),
+    discount_price: Optional[int] = Form(None),
+    expires_date: Optional[str] = Form(None),
+    is_active: Optional[bool] = Form(None),
+    usage_limit: Optional[int] = Form(None),
+   db: Session = Depends(get_db)
+):
+    db_coupons = db.query(models.CouponCode).filter(models.CouponCode.id == id).first()
+    if not db_coupons:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Coupon Code not found")
+    if code and db_coupons.code != code:
+
+        existing = db.query(models.CouponCode).filter(models.CouponCode.code == code).first()
+        if existing:
+            
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="This Coupon code already exists."
+            )
+    
+  
+    if code:
+        db_coupons.code = code
+    if discount_price is not None:
+        db_coupons.discount_price = discount_price
+    if expires_date:
+        db_coupons.expires_date = expires_date
+    if is_active is not None:
+        db_coupons.is_active = is_active
+    if usage_limit is not None:
+        db_coupons.usage_limit = usage_limit
+
+    db.commit()
+    db.refresh(db_coupons)
+    return db_coupons
+
+# Delete Coupon code 
+
+@router.delete('/{id}', response_model= CouponCodeBase)
 async def coupon_code(
-    coupon_code : str,
+    id : int,
     db: Session = Depends(get_db)
 ):
-    get_coupon_code = db.query(models.CouponCode).filter(models.CouponCode.code == coupon_code).first()
+    get_coupon_code = db.query(models.CouponCode).filter(models.CouponCode.id == id).first()
 
     if not get_coupon_code:
         raise HTTPException(
-            status_code=status.HTTP_404_CONFLICT,
+            status_code=status.HTTP_409_CONFLICT,
             detail="Coupon Code not found"
         )
     db.delete(get_coupon_code)
@@ -80,7 +141,7 @@ async def coupon_code(
 
 # Apply Coupon 
 @router.put('/appy/', response_model = CouponCodeBase)
-async def apply_coupon_code(
+async def apply_coupon_code(    
     code: str = Form(...),
     db: Session = Depends(get_db)
 ):

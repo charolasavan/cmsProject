@@ -101,3 +101,5 @@ body.swal2-height-auto { height: 100% !important; }
 .product_image_viewer .image_slider{ display: flex; justify-content: center; }
 .content-area { position: relative; overflow-x: hidden; } */
 
+.active { font-weight: 600; color: green; }
+.deactive { font-weight: 600; color: red; }

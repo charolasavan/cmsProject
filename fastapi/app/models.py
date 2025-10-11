@@ -96,7 +96,7 @@ class CouponCode(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     code = Column(String(250))
     discount_price = Column(Integer)
-    expires_date = Column(DateTime)
+    expires_date = Column(Date, nullable=False)
     is_active = Column(Integer)
     usage_limit = Column(Integer)
     usage_count = Column(Integer, nullable = False, default = False)
