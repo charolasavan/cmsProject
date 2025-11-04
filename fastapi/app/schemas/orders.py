@@ -8,7 +8,7 @@ class OrderBase(BaseModel):
     products : str
     product_quantity: int
     product_price : int
-    order_data : date
+    order_date : date
     user_name : str
     user_address : str
     user_email_id: str

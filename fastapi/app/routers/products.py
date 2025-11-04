@@ -8,6 +8,8 @@ import uuid
 from pathlib import Path
 from typing import List, Optional
 import shutil
+from sqlalchemy import or_
+
 router = APIRouter(prefix="/products", tags=["Products"])
 
 # Set Path for image
@@ -33,7 +35,6 @@ def get_all_products(db: Session = Depends(get_db)):
         joinedload(models.Products.images),
         joinedload(models.Products.category) 
     ).all()
-    # products = db.query(models.Products).all()
     return products
 
 
@@ -184,7 +185,7 @@ async def update_product(
     return db_product
 
 # Delete a product by ID
-@router.delete("/{product_id}")
+@router.delete("/{product_id}", response_model = ProductBase)
 async def delete_product(product_id: int, db: Session = Depends(get_db)):
     db_product = db.query(models.Products).filter(models.Products.id == product_id).first()
     if not db_product:
@@ -195,7 +196,8 @@ async def delete_product(product_id: int, db: Session = Depends(get_db)):
 
     db.delete(db_product)
     db.commit()
-    return None 
+    return db_product 
+
 
 # Delete Images By id
 @router.delete("/product_image/{image_id}/")
@@ -220,3 +222,53 @@ async def delete_product_image(image_id: int, db: Session = Depends(get_db)):
      db.commit()
 
      return {"message": "Image Deleted Successfully"}
+
+
+
+
+
+# Seach Specific Product
+@router.post("/getproduct/")
+async def get_product(
+    product_name: Optional[str] = Form(None),
+    regular_price: Optional[int] = Form(None),
+    selling_price: Optional[int] =Form(None),
+    product_brand: Optional[str] = Form(None),
+    product_company: Optional[str] = Form(None),
+    product_status: Optional[str] = Form(None),
+    category_id : Optional[int] =  Form(None),
+    db: Session = Depends(get_db)
+):
+    # return user_name
+    
+    search_product = db.query(models.Products).options(
+        joinedload(models.Products.category) 
+        ).filter(
+                or_(
+                    models.Products.product_name == product_name,  
+                    models.Products.regular_price == regular_price ,
+                    models.Products.selling_price == selling_price ,
+                    models.Products.product_brand == product_brand ,
+                    models.Products.product_company == product_company ,
+                    models.Products.product_status == product_status ,
+                    models.Products.category_id == category_id ,
+                )
+            ).all()
+
+    if not search_product:
+        return {"message": "Product Not Found"}
+
+    # result = [
+    #     {
+    #         "product_name": product.product_name,
+    #         "regular_price": product.regular_price,
+    #         "selling_price": product.selling_price,
+    #         "product_brand": product.product_brand,
+    #         "product_company": product.product_company,
+    #         "product_status": product.product_status,
+    #         "category_name": category_name
+    #     }
+    #     for product, category_name in search_product
+    # ]
+    
+    return search_product

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import api from '../../api';
 import Swal from 'sweetalert2';
 
+
 function CategoryList() {
   const [categories, setCategories] = useState([]); // setCategory for select Product
   const [form, setForm] = useState({ category_name: '', parent_id: 0 });
@@ -13,6 +14,7 @@ function CategoryList() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
 
 
   // fetch categories 
@@ -128,6 +130,7 @@ function CategoryList() {
       ...renderOptions(children, depth + 1)
     ]);
 
+
   // display table using recursive method
   let count = 0;   // display Counte of category number
   const renderCategory = (items, depth = 0) => {
@@ -150,8 +153,11 @@ function CategoryList() {
           </td>
         </tr>,
         ...renderCategory(children, depth + 1)
+
       ];
+
     });
+
   };
 
   return (

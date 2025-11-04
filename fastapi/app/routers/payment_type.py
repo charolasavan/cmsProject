@@ -24,11 +24,10 @@ async def get_payment_type(db: Session = Depends(get_db)):
 # Add Payment Method (Type)
 @router.post('/', response_model = PaymentBase)
 async def add_payment_type(
-    payment_type_id : int = Form(...),
-    payment_type : str = Form(...),
+    payment_name : str = Form(...),
     db: Session = Depends(get_db)
 ):
-    existing = db.query(models.PaymentType).filter(models.PaymentType.payment_type_id == payment_type_id).all()
+    existing = db.query(models.PaymentType).filter(models.PaymentType.payment_name == payment_name).all()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -36,8 +35,7 @@ async def add_payment_type(
         )
         
     db_payment = models.PaymentType(
-        payment_type_id = payment_type_id,
-        payment_type = payment_type
+        payment_name = payment_name
     )
     
     db.add(db_payment)
@@ -50,7 +48,7 @@ async def add_payment_type(
 
 @router.get('/{id}/', response_model = PaymentBase)
 async def get_payment_type(id :int, db : Session = Depends(get_db)):
-    db_payment = db.query(models.PaymentType).filter(models.PaymentType.payment_type_id == id).first()
+    db_payment = db.query(models.PaymentType).filter(models.PaymentType.payment_id == id).first()
     return db_payment
     
     
@@ -59,24 +57,22 @@ async def get_payment_type(id :int, db : Session = Depends(get_db)):
 @router.put("/{id}/", response_model=PaymentBase)
 async def update_payment_type(
     id : int,
-    payment_type_id: int = Form(...),
-    payment_type: str = Form(...),
-    
+    payment_name: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    db_payment_type = db.query(models.PaymentType).filter(models.PaymentType.payment_type_id == id).first()
+    db_payment_type = db.query(models.PaymentType).filter(models.PaymentType.payment_id == id).first()
     if not db_payment_type:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Payment Type not found")
     
-    existing = db.query(models.PaymentType).filter(models.PaymentType.payment_type == payment_type).first()
+    existing = db.query(models.PaymentType).filter(models.PaymentType.payment_name == payment_name).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="This Payment Type already exists."
         )
     
-    db_payment_type.payment_type_id = payment_type_id
-    db_payment_type.payment_type = payment_type
+
+    db_payment_type.payment_name = payment_name
     
 
     db.commit()
@@ -88,7 +84,7 @@ async def update_payment_type(
 
 @router.delete('/{id}/', response_model = PaymentBase)
 async def delete_payment_type(id: int, db: Session = Depends(get_db)):
-    db_payment_type = db.query(models.PaymentType).filter(models.PaymentType.payment_type_id == id).first()
+    db_payment_type = db.query(models.PaymentType).filter(models.PaymentType.payment_id == id).first()
     if not db_payment_type:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -7,10 +7,25 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Button, Table } from 'react-bootstrap';
 import '../../App.css'
+import Pagination from '../../components/Pagination';
+
+
 
 function CouponList() {
     const [coupon, setCoupon] = useState([])
     const navigate = useNavigate();
+
+    const [page, setPage] = useState(0)
+    const [rowsPerPage, setRowsPerPage] = useState(5)
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage)
+    }
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10))
+        setPage(0)
+    }
+
 
     // FetchAll Coupon
     const fetchCoupon = async () => {
@@ -91,12 +106,12 @@ function CouponList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {coupon.map((data) => {
+                        {coupon.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data) => {
                             return (
                                 <tr key={`${data.id}-${data.code}`}>
                                     <td>{data.id}</td>
                                     <td>{data.code}</td>
-                                    <td>{data.discount_price}</td>
+                                    <td>{'₹' + data.discount_price}</td>
                                     <td>{data.expires_date}</td>
                                     <td>{data.usage_limit}</td>
                                     <td>{data.usage_count}</td>
@@ -131,6 +146,13 @@ function CouponList() {
                     </tbody>
                 </Table>
 
+                <Pagination
+                    count={coupon.length}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                />
 
             </div>
 

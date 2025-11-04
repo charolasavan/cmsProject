@@ -34,39 +34,28 @@ class Category(Base):
         cascade="all, delete-orphan"
     )
 
-class Products(Base):
-    __tablename__ = "products"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    product_name = Column(String(50))
-    product_quantity = Column(Integer)
-    regular_price = Column(Integer)
-    selling_price = Column(Integer)
-    product_brand = Column(String(50))
-    product_company = Column(String(50))
-    product_status = Column(String(50))
-    product_description = Column(String(250))
-    category_id = Column(Integer, ForeignKey("product_category.category_id"), nullable=False)
-    thumbnail_image = Column(String(250))
-    category = relationship("Category", backref="products")
-    images = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
 
-class ProductImage(Base):
-    __tablename__ = "product_images"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    image_name = Column(String(250))
-    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+class Customer(Base):
+    __tablename__ = "customer"
+    customer_id = Column(Integer, primary_key=True, index=True,autoincrement=True)
+    name = Column(String(250))
+    email = Column(String(250))
+    phone_number = Column(Integer)
+    address = Column(String(250))
+    city = Column(String(250))
+    state = Column(String(250))
+    zip_code = Column(String(250))
+    country = Column(String(250))
 
-    product = relationship("Products", back_populates="images")
-    
-    
 class Orders(Base):
     __tablename__ = "order_detail"
     order_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
-    products = Column(String(50))
+    product_id = Column(Integer, ForeignKey('products.id', ondelete='CASCADE'), nullable=False)
+    # product_id = Column(Integer)
+    products = Column(String(250))
     product_quantity = Column(Integer)
     product_price = Column(Integer)
-    order_data = Column(Date)
+    order_date = Column(Date)
     user_name = Column(String(250))
     user_address = Column(String(250))
     user_email_id = Column(String(250))
@@ -81,14 +70,41 @@ class Orders(Base):
     coupon_use = Column(String(250))
     estimate_delivery_date = Column(Date)
     
-    products = relationship("Products", backref="products")
+    product = relationship("Products", backref="product_order")
+class Products(Base):
+    __tablename__ = "products"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    product_name = Column(String(250))
+    product_quantity = Column(Integer)
+    regular_price = Column(Integer)
+    selling_price = Column(Integer)
+    product_brand = Column(String(250))
+    product_company = Column(String(250))
+    product_status = Column(String(250))
+    product_description = Column(String(250))
+    category_id = Column(Integer, ForeignKey("product_category.category_id"), nullable=False)
+    thumbnail_image = Column(String(250))
+
+    category = relationship("Category", backref="products")
+    images = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
+    order = relationship("Orders", back_populates="product") 
+
+class ProductImage(Base):
+    __tablename__ = "product_images"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    image_name = Column(String(250))
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False)
+
+    product = relationship("Products", back_populates="images")
+    
+    
+
     
     
 class PaymentType(Base):
     __tablename__ = "payment_type"
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    payment_type_id = Column(Integer)
-    payment_type = Column(String(250))
+    payment_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    payment_name = Column(String(250))
     
     
 class CouponCode(Base):
@@ -100,3 +116,5 @@ class CouponCode(Base):
     is_active = Column(Integer)
     usage_limit = Column(Integer)
     usage_count = Column(Integer, nullable = False, default = False)
+
+

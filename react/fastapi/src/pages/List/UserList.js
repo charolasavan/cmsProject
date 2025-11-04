@@ -7,10 +7,17 @@ import Table from 'react-bootstrap/Table';
 import Swal from 'sweetalert2'
 import { HiMiniArrowsUpDown } from "react-icons/hi2";
 import { FaSearch } from "react-icons/fa";
+import Pagination from '../../components/Pagination';
+
+
 
 function UserList() {
   // const navigate = useNavigate();
   const [user, setUser] = useState([])
+
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(5)
+
   const [searchUser, setSearchUser] = useState({
     user_name: '',
     email_id: '',
@@ -26,12 +33,24 @@ function UserList() {
   const [order, setOrder] = useState("ASC")
   const [filterData, setFilterData] = useState([])  // filtered Data
 
+
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage)
+  }
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10))
+    setPage(0)
+  }
+
+
+
   const fetchUserDetail = async () => {
     try {
-      const users = await api.get('/users/');
-      const fetchedUsers = users.data;
-      setUser(fetchedUsers);
-      setFilterData(fetchedUsers)
+      const response = await api.get('/users/');
+      // const fetchedUsers = users.data;
+      setUser(response.data);
+      setFilterData(response.data)
     }
     catch (error) {
       Swal.fire({
@@ -170,14 +189,14 @@ function UserList() {
         <Row>
           <Col>
             <Form.Group className='mb-3'>
-              {/* <Form.Control
-                type='text'
+
+              <Form.Control
+                type="text"
                 name='user_name'
-                placeholder='name'
+                placeholder="Search User"
                 value={searchUser.user_name}
                 onChange={handleSearch}
-              /> */}
-              <Form.Control type="text" name='user_name' placeholder="Search User" value={searchUser.user_name} onChange={handleSearch} />
+              />
             </Form.Group>
           </Col>
           <Col>
@@ -453,7 +472,13 @@ function UserList() {
           })}
         </tbody>
       </Table>
-
+      <Pagination
+        count={filterData != null ? filterData.length : 0}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
     </Container>
   );
 }

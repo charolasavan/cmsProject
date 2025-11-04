@@ -9,7 +9,7 @@ function AddCoupon() {
     const [coupon, setCoupon] = useState({
         code: '',
         discount_price: 0,
-        expires_datee: '',
+        expires_date: '',
         is_active: false,
         usage_limit: 0,
     });
@@ -29,19 +29,16 @@ function AddCoupon() {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-
-
-
         const validation = {}
 
-        if (!coupon.code?.trim()) {
+        if (coupon.code && coupon.code != "") {
             validation.code = "Code is Required!!!"
         }
         if (!coupon.discount_price) {
             validation.discount_price = "Discount Price is Required!!!"
         }
-        if (!coupon.expires_datee) {
-            validation.expires_datee = "Expire Date is Required!!!"
+        if (!coupon.expires_date) {
+            validation.expires_date = "Expire Date is Required!!!"
         }
         if (!coupon.usage_limit) {
             validation.usage_limit = "Usage Limit is Required!!!"
@@ -56,9 +53,9 @@ function AddCoupon() {
 
         if (Object.keys(validation).length === 0) {
             const addCoupon = new FormData();
-            addCoupon.append('code', coupon.code.trim());
+            addCoupon.append('code', coupon.code);
             addCoupon.append('discount_price', coupon.discount_price);
-            addCoupon.append('expires_datee', coupon.expires_datee);
+            addCoupon.append('expires_date', coupon.expires_date);
             addCoupon.append('is_active', coupon.is_active);
             addCoupon.append('usage_limit', coupon.usage_limit);
 
@@ -149,10 +146,10 @@ function AddCoupon() {
                             <Form.Label>Expire Date</Form.Label>
                             <Form.Control
                                 type="date"
-                                name='expires_datee'
+                                name='expires_date'
                                 onChange={handleChange}
                             />
-                            {formError.expires_datee && <span className='validationError'>{formError.expires_datee}</span>}
+                            {formError.expires_date && <span className='validationError'>{formError.expires_date}</span>}
                         </Form.Group>
                     </Col>
                     <Col>
@@ -176,8 +173,8 @@ function AddCoupon() {
                                 value={coupon.is_active}
                                 onChange={handleChange}
                             >
-                                <option value="" disabled>Select</option>
-                                <option value={true}>Active</option>
+                                <option value="" disabled >Select</option>
+                                <option  value={true} >Active</option>
                                 <option value={false}>DeActive</option>
                             </Form.Select>
                             {formError.is_active && <span className='validationError'>{formError.is_active}</span>}

@@ -1,192 +1,259 @@
 import React, { useState, useEffect } from 'react';
-// import Table from 'react-bootstrap/Table';
-import 'swiper/css';
 import api from '../../api';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Swal from 'sweetalert2';
-// import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { Button, Form, Table } from 'react-bootstrap';
+import { Button, Table, Form, Col, Row } from 'react-bootstrap';
+import '../../App.css'
+import { FaSearch } from "react-icons/fa";
+import { HiMiniArrowsUpDown } from "react-icons/hi2";
 
-function ProductList() {
-  const [productData, setProductData] = useState([])
-  // const [isOpen, setIsOpen] = useState(false)
-  const navigate = useNavigate();
+function OrderList() {
 
-  // FetchAll product 
-  const fetchProduct = async () => {
+  const [order, setOrder] = useState([])
+  const [filterData, setFilterData] = useState([])
+
+  const fetchOrder = async () => {
     try {
-      const response = await api.get('/products/')
-      setProductData(response.data);
+      const response = await api.get('/orders/')
+      setOrder(response.data)
+      setFilterData(response.data)
     }
     catch (error) {
       Swal.fire({
         icon: "error",
         title: "Oops..",
-        text: error?.response?.data?.detail || error.message || "Faild To Fetch Iteams"
+        text: error?.response?.data?.detail || error.message || "Faild To Fetch Order Data"
       });
     }
-  };
-  // Handle Delete product 
 
-  const handleDelete = async (id) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!"
-    })
 
-    if (result.isConfirmed) {
-      try {
-        await api.delete(`/products/${id}`);
-        setProductData(productData.filter(productData => productData.id !== id));
-        Swal.fire({
-          title: "Deleted!",
-          text: "Your Product has been deleted.",
-          icon: "success"
-        });
-
-      }
-      catch (error) {
-        // console.log("Error is", error.data)
-        Swal.fire({
-          icon: "error",
-          title: "Faild",
-          text: error?.response?.data?.detail || error.message || "Faild To Delete Iteam"
-        });
-      }
-    }
-
-  };
-
-  // Call Api useing useEffect hook
+  }
 
   useEffect(() => {
-    fetchProduct();
-  }, []);
-  const settings = {
-    dots: true,
-    lazyLoad: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    initialSlide: 2
-  };
-
+    fetchOrder()
+  }, [])
   return (
-    <div>
-      <h3>Products</h3>
+    <>
+      <h3>Orders</h3>
+      <div className="mt-3">
+        {/* <Button
+          className='mb-3'
+          variant='primary'
+        // onClick={() => navigate('/products/add')}
+        >
+          Add Order
+        </Button> */}
 
-      <div className='mt-3'>
-        <Button className='mb-3' variant='primary' onClick={() => navigate('/products/add')}>
-          Add Product
-        </Button>
         <Table striped bordered hover className='text-center' responsive>
           <thead>
             <tr>
-              <th>id</th>
-              <th>Product Name</th>
-              <th>Quantity / Units</th>
-              <th>Regular price</th>
-              <th>Selling price</th>
-              <th>Product Brand</th>
-              <th>Product Company</th>
-              <th>Product Status</th>
-              <th>Product Category</th>
-              <th>Thumbnail Images</th>
-              {/* <th>Images</th> */}
+              <th>
+                Order id
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+              <th>
+                Product id
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+              <th>
+                Products
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+              <th>
+                Quantity
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Price
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Order Date
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                User Name
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Address
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Email Id
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Mobile number
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Payment Type
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Product Taxes
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Order Status
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Billing Address
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Discount Code
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Total Discount
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Payment Status
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Used Coupon
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+              <th>
+                Estimate Delivery Date
+                <span className='ps-2'>
+                  <Button>
+                    <HiMiniArrowsUpDown />
+                  </Button>
+                </span>
+              </th>
+
+
               <th>Edit</th>
               <th>Delete</th>
             </tr>
           </thead>
           <tbody>
-            {productData.map((data) => {
+            {filterData.map((data, index) => {
               return (
-                <tr key={`${data.id}-${data.product_name}`}>
-                  <td>{data.id}</td>
-                  <td>{data.product_name}</td>
+                <tr key={`${index}`}>
+                  <td>{data.order_id}</td>
+                  <td>{data.product_id}</td>
+                  <td>{data.products}</td>
                   <td>{data.product_quantity}</td>
-                  <td>{data.regular_price}</td>
-                  <td>{data.selling_price}</td>
-                  <td>{data.product_brand}</td>
-                  <td>{data.product_company}</td>
-                  <td>
-                    {
-                      data.product_status == "Active" ?
-                        (
-                          <p style={{
-                            color: "green",
-                          }}>Active</p>
-                        ) :
-                        (
-                          <p style={{
-                            color: "red"
-                          }}>DeActive</p>
-                        )
-                    }
-                  </td>
-                  <td>{data.category.category_name}</td>
-                  <td>
-                    <img
-                      className='thumbnail_img'
-                      src={`http://localhost:8000${data.thumbnail_image}`}
-                      alt='productImage'
-                    />
-                  </td>
-                  {/* <td>
-                    <Button variant='success'
-                      onClick={() => { setIsOpen(!isOpen) }}
-                    >View</Button>
-                    {isOpen && (
-                      <>
-                        <div className='product_image_viewer'>
-                          <div className='d-flex justify-content-end'>
-                            <Button
-                              onClick={() => { setIsOpen(!isOpen) }}>
-                              Close
-                            </Button>
-                          </div>
-                          <div>
-                            <div className="slider-container">
-                              <Slider {...settings}>
+                  <td>{data.product_price}</td>
+                  <td>{data.order_date}</td>
+                  <td>{data.user_name}</td>
+                  <td>{data.user_address}</td>
+                  <td>{data.user_email_id}</td>
+                  <td>{data.mobile_number}</td>
+                  <td>{data.payment_type}</td>
+                  <td>{data.product_taxes}</td>
+                  <td>{data.order_status}</td>
+                  <td>{data.billing_address}</td>
+                  <td>{data.discount_code}</td>
+                  <td>{data.total_discount_price}</td>
+                  <td>{data.payment_status}</td>
+                  <td>{data.coupon_use}</td>
+                  <td>{data.estimate_delivery_date}</td>
 
-                                {data.images.map((name, index) => {
-                                  return (
-                                    <div key={index} className='d-flex justify-content-center' >
-                                      <img
-                                        className='product_image'
-                                        src={`http://localhost:8000${name.image_name}`}
-                                        alt='productImage'
-                                      />
-                                    </div>
-                                  )
-
-                                })}
-                              </Slider>
-                            </div>
-                          </div>
-
-                        </div>
-                      </>
-
-                    )}
-                  </td> */}
                   <td>
                     <Link to={`/EditProduct/${data.id}`}>
                       <Button>Edit</Button>
                     </Link>
                   </td>
                   <td>
-                    <Button variant="danger" onClick={() => {
-                      handleDelete(data.id)
-                    }}>Delete</Button>
+                    <Button variant="danger" >Delete</Button>
 
                   </td>
                 </tr>
@@ -194,14 +261,12 @@ function ProductList() {
             })}
           </tbody>
         </Table>
-
-
       </div>
 
-    </div >
-  );
+
+
+    </>
+  )
 }
 
-
-
-export default ProductList;
+export default OrderList

@@ -2,7 +2,7 @@
 # app/main.py
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import users, category, products , orders, coupon_code , payment_type
+from app.routers import users, category, products , orders, coupon_code , payment_type, customer
 from app import models
 from app.database import engine
 from fastapi.staticfiles import StaticFiles
@@ -32,5 +32,6 @@ app.include_router(products.router)
 app.include_router(orders.router)
 app.include_router(coupon_code.router)
 app.include_router(payment_type.router)
+app.include_router(customer.router)
 
     

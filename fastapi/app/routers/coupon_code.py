@@ -28,9 +28,10 @@ def get_coupons(db: Session = Depends(get_db)):
 
 def generate_unique_coupon_code():
     return f"#{str(uuid.uuid4())[:6].upper()}"
+
 @router.post('/', response_model = CouponCodeBase)
 async def generate_coupons(
-  code : str = Form(None),
+  code : Optional[str] = Form(None),
   discount_price : int = Form(...),
   expires_date : str  =  Form(...),
   is_active : bool = Form(...),
