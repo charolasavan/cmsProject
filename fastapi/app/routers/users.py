@@ -1,18 +1,19 @@
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, date
 from typing import Optional
 from pathlib import Path
 import uuid
-from sqlalchemy import or_
+from sqlalchemy import or_ , select
 
 from app import models
-from app.schemas.user import UserBase
+from app.schemas.user import UserBase, UserLogin
 from app.database import SessionLocal
 
+from fastapi.security import OAuth2PasswordBearer
 
-SECRET_KEY = "your_secret_key_here"  
+SECRET_KEY = "YOUR_SECRET_KEY"  
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -48,7 +49,7 @@ def verify_token(token: str):
 
 
 # --- Auth Protected Dependency ---
-from fastapi.security import OAuth2PasswordBearer
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login/")
 
@@ -64,14 +65,52 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     return payload
 
 
-# --- Auth/Login ---
+
+@router.get("/")
+def get_users(db: Session = Depends(get_db)):
+
+    db_user = db.query(models.User).all()
+    # .options(
+    #     # joinedload(models.User_has_role.user_role),
+    #     # joinedload(models.User_has_role.role_name_user) 
+    # )
+    # all()
+
+    return db_user
+
+
+
 @router.post("/login/")
-async def login(email_id: str = Form(...), user_password: str = Form(...), db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.email_id == email_id).first()
+async def login(
+    # user_name : str = Form(...) ,
+    email_id: str = Form(...),
+    user_password: str = Form(...), 
+    db: Session = Depends(get_db)
+    ):
+
+    db_user = db.query(models.User).filter(
+        or_(
+            # models.User.user_name == user_name,
+           models.User.email_id == email_id ,
+           models.User.user_password == user_password
+        )
+        ).first()
+
+    # db_user_role = db.query(models.Roles.role_name).join(models.User_has_role).filter(models.User_has_role.user_id == db_user.id).scalar()
+    db_user_role = (
+    db.query(models.Roles.role_name)
+    .join(models.User_has_role, models.Roles.id == models.User_has_role.role_id)
+    .filter(models.User_has_role.user_id == db_user.id)
+    .scalar()
+)
+    # return db_user_role
     
     if not db_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid EmailId")
     
+    # if db_user.user_name != user_name :
+    #     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid User Name")
+
     if db_user.user_password != user_password :
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Password")
     
@@ -80,6 +119,14 @@ async def login(email_id: str = Form(...), user_password: str = Form(...), db: S
 
 
     token = create_access_token({"sub": db_user.email_id, "user_id": db_user.id})
+    
+    if not db_user_role:
+        raise HTTPException(
+        status_code=403,
+        detail="User role not assigned"
+    )
+
+
     return {
         "access_token": token,
         "token_type": "bearer",
@@ -87,15 +134,12 @@ async def login(email_id: str = Form(...), user_password: str = Form(...), db: S
             "id": db_user.id,
             "user_name": db_user.user_name,
             "email_id": db_user.email_id,
-            "profile_img": db_user.profile_img
+            "profile_img": db_user.profile_img,
+            "role" : db_user_role
         }
     }
 
-
-
-@router.get("/")
-def get_users(db: Session = Depends(get_db)):
-    return db.query(models.User).all()
+    
 
 @router.post("/")
 async def create_user(
@@ -111,6 +155,7 @@ async def create_user(
     zip_code: str = Form(...),
     country: str = Form(...),
     profile_img: UploadFile = File(...),
+    # role_id : Optional[int] = Form(None),
     db: Session = Depends(get_db)
 ):
     existing = db.query(models.User).filter(       
@@ -150,6 +195,30 @@ async def create_user(
     db.commit()
     db.refresh(db_user)
 
+
+    #  default_role = db.query(models.Roles).filter(
+    #     models.Roles.role_name == "USER"
+    # ).first()
+
+    # if not default_role:
+    #     raise HTTPException(
+    #         status_code=500,
+    #         detail="Default role not found"
+    #     )
+
+    # user_role = models.User_has_role(
+    #     user_id=db_user.id,
+    #     role_id=default_role.id
+    # )
+
+    # db.add(user_role)
+    # db.commit()
+
+    # return {
+    #     "message": "User created successfully",
+    #     "user_id": db_user.id,
+    #     "role": default_role.role_name
+    # }
     return db_user
 
 

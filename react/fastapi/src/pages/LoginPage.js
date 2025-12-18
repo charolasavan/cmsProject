@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { IoMail } from "react-icons/io5";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+import { FaUser } from "react-icons/fa6";
 import { FaLock } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import api from "../api";
+import api from 'api/apiClient'
 
-function LoginPage({ onLogin }) {
+function LoginPage() {
   const navigate = useNavigate();
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [userLogin, setUserLogin] = useState({
+    // user_name: '',
     email_id: '',
     user_password: '',
   });
@@ -17,6 +19,7 @@ function LoginPage({ onLogin }) {
   const fetchLogin = async () => {
     try {
       const userInfo = new FormData();
+      // userInfo.append('user_name', userLogin.user_name);
       userInfo.append('email_id', userLogin.email_id);
       userInfo.append('user_password', userLogin.user_password);
 
@@ -24,8 +27,9 @@ function LoginPage({ onLogin }) {
       localStorage.setItem("token", response.data.access_token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
       localStorage.setItem("auth", "true");
+      localStorage.setItem("userRole", response.data.user.role)
+      localStorage.setItem('isLoggedin', "true")
 
-      onLogin();
 
       const Toast = Swal.mixin({
         toast: true,
@@ -43,7 +47,13 @@ function LoginPage({ onLogin }) {
         title: "User Login Successfully"
       });
 
-      navigate('/dashboard');
+      if (response.data.user.role === 'admin') {
+        navigate('/admin')
+      }
+      else {
+        navigate('/user')
+      }
+
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -68,7 +78,7 @@ function LoginPage({ onLogin }) {
 
   return (
     <div className="h-100 d-flex justify-content-center align-items-center">
-      <div className="login-container container" style={{ maxWidth: "400px" }}>
+      <div className="login-container" style={{ maxWidth: "400px" }}>
         <h2 className="form-title text-center mb-4">Log in with</h2>
 
         <div className="social-login d-flex gap-2 mb-4">
@@ -85,6 +95,20 @@ function LoginPage({ onLogin }) {
         <p className="separator text-center my-3"><span>or</span></p>
 
         <form className="login-form" onSubmit={handleSubmit} >
+          {/* <div className="position-relative mb-3">
+            <input
+              type="name"
+              name="user_name"
+              onChange={handleChange}
+              placeholder="User Name"
+              className="form-control ps-5"
+              required
+              value={userLogin.user_name}
+            />
+            <span className="position-absolute top-50 start-0 translate-middle-y ps-3 text-secondary">
+              <FaUser />
+            </span>
+          </div> */}
           <div className="position-relative mb-3">
             <input
               type="email"
@@ -121,9 +145,14 @@ function LoginPage({ onLogin }) {
               {isPasswordShown ? <MdVisibility /> : <MdVisibilityOff />}
             </span>
           </div>
-
           <button type="submit" className="btn btn-primary w-100 mt-3">Log In</button>
         </form>
+        <div className="pt-2 text-end">
+          <Link to={'/user/create-account'}>
+            <p  className="text-primary">Create User</p>
+          </Link>
+        </div>
+
       </div>
     </div>
   );

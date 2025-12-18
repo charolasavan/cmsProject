@@ -34,6 +34,7 @@ def get_all_products(db: Session = Depends(get_db)):
     products = db.query(models.Products).options(
         joinedload(models.Products.images),
         joinedload(models.Products.category) 
+        # joinedload(models.Products.tax)
     ).all()
     return products
 
@@ -126,15 +127,15 @@ async def get_product_by_id(product_id: int, db: Session = Depends(get_db)):
 @router.put("/{product_id}/", response_model=ProductBase, status_code=status.HTTP_200_OK)
 async def update_product(
     product_id : int ,
-    product_name: str = Form(...),
-    regular_price: int = Form(...),
-    selling_price: int = Form(...),
-    product_quantity: int = Form(...),
-    product_brand: str = Form(...),
-    product_company: str = Form(...),
-    product_status: str = Form(...),
-    product_description: str = Form(...),
-    category_id: int = Form(...),
+    product_name: Optional[str] = Form(...),
+    regular_price: Optional[int] = Form(...),
+    selling_price: Optional[int] = Form(...),
+    product_quantity: Optional[int] = Form(...),
+    product_brand: Optional[str] = Form(...),
+    product_company: Optional[str] = Form(...),
+    product_status: Optional[str] = Form(...),
+    product_description: Optional[str] = Form(...),
+    category_id: Optional[int] = Form(...),
     thumbnail_image: Optional[UploadFile] = File(None),
     images: Optional[List[UploadFile]] = File(None),
     db: Session = Depends(get_db)
@@ -257,18 +258,22 @@ async def get_product(
 
     if not search_product:
         return {"message": "Product Not Found"}
-
-    # result = [
-    #     {
-    #         "product_name": product.product_name,
-    #         "regular_price": product.regular_price,
-    #         "selling_price": product.selling_price,
-    #         "product_brand": product.product_brand,
-    #         "product_company": product.product_company,
-    #         "product_status": product.product_status,
-    #         "category_name": category_name
-    #     }
-    #     for product, category_name in search_product
-    # ]
     
     return search_product
+
+
+@router.post("/category/{category_id}/")
+def getCategoryProduct(category_id:int, db: Session = Depends(get_db)):
+    db_category_product = db.query(models.Products).filter(models.Products.category_id == category_id).all()
+    if not db_category_product:
+        return {"message": "Product Not Found"}
+    return db_category_product
+
+
+    
+
+    # return {
+    #     "product" : db_category_product,
+    #     "category" : products_category
+    # }
+

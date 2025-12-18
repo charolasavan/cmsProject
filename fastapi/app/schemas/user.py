@@ -16,6 +16,11 @@ class UserBase(BaseModel):
     zip_code: Optional[int] = None 
     country: Optional[str] = None 
     profile_img: Optional[str] = None 
-    
+    # role_id : Optional[int] = None
     class Config:
         orm_mode = True
+
+class UserLogin(BaseModel):  #whene login then use it to check details
+    user_name: str
+    email_id : str
+    user_password: str

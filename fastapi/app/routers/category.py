@@ -66,7 +66,11 @@ async def get_category(category_id: int, db: Session = Depends(get_db)):
 @router.put("/{category_id}", response_model=CategoryBase)
 async def update_category(category_id: int, category: CategoryBase, db: Session = Depends(get_db)):
     db_category = db.query(models.Category).filter(models.Category.category_id == category_id).first()
-    existing = db.query(models.Category).filter(models.Category.category_name == category.category_name).first()
+    existing = db.query(models.Category)\
+    .filter(models.Category.category_name == category.category_name)\
+    .filter(models.Category.category_id != category_id)\
+    .first()
+
     if not db_category:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
 

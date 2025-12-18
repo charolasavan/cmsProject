@@ -19,10 +19,10 @@ class ProductBase(BaseModel):
     product_company: Optional[str] = None
     product_status: Optional[str] = None
     product_description: Optional[str] = None
-    # category_id: Optional[List[int]] = []
     category_id : Optional[int] = None
     thumbnail_image: Optional[str] = None
     images: Optional[List[ProductImageBase] ] = None
+    # taxes_id: Optional[int] = None
 
     class Config:
         orm_mode = True
