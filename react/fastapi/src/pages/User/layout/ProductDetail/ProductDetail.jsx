@@ -1,6 +1,6 @@
 import api from 'api/apiClient'
 import React, { useEffect, useState } from 'react'
-import {  useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { FaArrowRight } from "react-icons/fa6";
 import ProductViewSlider from '../Components/ProductViewSlider';
 
@@ -44,7 +44,7 @@ function ProductDetail() {
 
                 <div className="container">
                     <div className='back-to-page'>
-                        <button onClick={()=>navigate(-1)}>
+                        <button onClick={() => navigate(-1)}>
                             Back to page
                         </button>
                     </div>
@@ -54,8 +54,9 @@ function ProductDetail() {
                                 <h2><span>{value.product_name}</span></h2>
                             </div>
                             <div className='product-inner-detail'>
-                                <p className='regular_price'>M.R.P: <span>{value.regular_price + ' ' + '₹'} </span></p>
-                                <p className='price'> <span>{value.selling_price + ' ' + '₹'}</span></p>
+                                {/* <p className='regular_price'> <span>{value.regular_price + ' ' + '₹'} </span></p> */}
+                                {/* <p className='price '> M.R.P : <span>{value.selling_price + ' ' + '₹'}</span></p> */}
+                                {value.selling_price == 0 ? <p className='price '> M.R.P : <span>{value.regular_price + ' ' + '₹'}</span></p> : <p className='price '> M.R.P : <span>{value.selling_price + ' ' + '₹'}</span></p>}
                                 <p className='quantity'>Quantity:<span>{value.product_quantity}</span></p>
                                 <p className='slogan'><span>{value.product_description}</span></p>
                             </div>

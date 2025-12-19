@@ -64,7 +64,8 @@ function CategoryProductView({ searchProduct }) {
                         </div>
                         <div className="product-detail">
                             <h3>{data.product_name}</h3>
-                            <p>₹{data.selling_price}</p>
+                            {/* <p>₹{data.selling_price}</p> */}
+                            {data.selling_price ==0 ? <p>₹{data.regular_price}</p> : <p>₹{data.selling_price}</p> }
                         </div>
                         <div className="product-add-cart">
                             <button>

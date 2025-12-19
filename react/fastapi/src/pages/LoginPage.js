@@ -148,7 +148,7 @@ function LoginPage() {
           <button type="submit" className="btn btn-primary w-100 mt-3">Log In</button>
         </form>
         <div className="pt-2 text-end">
-          <Link to={'/user/create-account'}>
+          <Link to={'/create-account'}>
             <p  className="text-primary">Create User</p>
           </Link>
         </div>

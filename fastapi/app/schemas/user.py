@@ -16,7 +16,7 @@ class UserBase(BaseModel):
     zip_code: Optional[int] = None 
     country: Optional[str] = None 
     profile_img: Optional[str] = None 
-    # role_id : Optional[int] = None
+    # role_id : Optional[int] = 2
     class Config:
         orm_mode = True
 

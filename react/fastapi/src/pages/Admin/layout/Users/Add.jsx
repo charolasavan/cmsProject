@@ -22,6 +22,7 @@ function AddUser() {
         zip_code: '',
         country: '',
         profile_img: '',
+        role_id: '',
     })
     const [formError, setFormError] = useState([])
     const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -106,6 +107,9 @@ function AddUser() {
             addUserData.append('country', userData.country.trim());
             addUserData.append('profile_img', userData.profile_img);
 
+            if (userData.role_id != '') {
+                addUserData.append('role_id', userData.role_id);
+            }
             try {
                 await api.post('/users/', addUserData);
                 // alert('User added successfully!');
@@ -147,12 +151,12 @@ function AddUser() {
                 {/* Personal Information */}
                 <h5 className="mb-3">Personal Information</h5>
                 <Row className="mb-3">
-                    <Col md={6}>
+                    <Col md={4}>
                         <Form.Label>Full Name</Form.Label>
                         <Form.Control type="text" name='user_name' placeholder="Savan Charola" onChange={handleChange} />
                         {formError.user_name && <span className='validationError'>{formError.user_name}</span>}
                     </Col>
-                    <Col md={6}>
+                    <Col md={4}>
                         <Form.Label>Password</Form.Label>
                         <div className="position-relative">
                             <Form.Control
@@ -174,6 +178,15 @@ function AddUser() {
                             </span>
                         </div>
                         {formError.user_password && <span className='validationError'>{formError.user_password}</span>}
+                    </Col>
+                    <Col md={4}>
+                        <Form.Label>Role</Form.Label>
+                        <Form.Select name='role_id' onChange={handleChange}>
+                            <option value="" selected disabled>Select</option>
+                            <option value="2">User</option>
+                            <option value="1">Admin</option>
+                        </Form.Select>
+
                     </Col>
 
                 </Row>

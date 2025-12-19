@@ -138,13 +138,13 @@ const EditProduct = () => {
             validation.product_name = "Product name is required"
         }
 
-        if (!value.regular_price) {
-            validation.regular_price = "Regular Price is required"
-        }
+        // if (!value.regular_price) {
+        //     validation.regular_price = "Regular Price is required"
+        // }
 
-        if (!value.selling_price) {
-            validation.selling_price = "Selling Price is required"
-        }
+        // if (!value.selling_price) {
+        //     validation.selling_price = "Selling Price is required"
+        // }
         if (!value.product_quantity) {
             validation.product_quantity = "Quantity is required"
         }
@@ -393,7 +393,7 @@ const EditProduct = () => {
                                         <div className='image_view mb-3'>
 
                                             {value.images.map((name, index) => {
-                                                { console.log(name) }
+                                                // { console.log(name) }
                                                 const isFile = name instanceof File || name.images instanceof File;
                                                 const imgSrc = isFile
                                                     ? URL.createObjectURL(name instanceof File ? name : name.images)

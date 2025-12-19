@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Image, Button } from 'react-bootstrap'
 import api from 'api/apiClient'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
-function UserProfile() {
+function AdminProfile() {
   const [userData, setUserData] = useState({
     // id: null,
     user_name: '',
@@ -150,4 +150,4 @@ function UserProfile() {
   );
 }
 
-export default UserProfile;
+export default AdminProfile;

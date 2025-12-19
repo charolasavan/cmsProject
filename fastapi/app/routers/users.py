@@ -70,14 +70,15 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 def get_users(db: Session = Depends(get_db)):
 
     db_user = db.query(models.User).all()
-    # .options(
-    #     # joinedload(models.User_has_role.user_role),
-    #     # joinedload(models.User_has_role.role_name_user) 
-    # )
-    # all()
+    # db_user_role = db.query(models.User_has_role).options(
+    #     joinedload(models.User_has_role.user_role),
+    #     joinedload(models.User_has_role.role_name_user) 
+    # ).filter(models.User_has_role.user_id == models.User.id).all()
+
 
     return db_user
-
+    
+        
 
 
 @router.post("/login/")
@@ -91,20 +92,10 @@ async def login(
     db_user = db.query(models.User).filter(
         or_(
             # models.User.user_name == user_name,
-           models.User.email_id == email_id ,
+           models.User.email_id == email_id and
            models.User.user_password == user_password
         )
         ).first()
-
-    # db_user_role = db.query(models.Roles.role_name).join(models.User_has_role).filter(models.User_has_role.user_id == db_user.id).scalar()
-    db_user_role = (
-    db.query(models.Roles.role_name)
-    .join(models.User_has_role, models.Roles.id == models.User_has_role.role_id)
-    .filter(models.User_has_role.user_id == db_user.id)
-    .scalar()
-)
-    # return db_user_role
-    
     if not db_user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid EmailId")
     
@@ -117,6 +108,17 @@ async def login(
     if not db_user or db_user.user_password != user_password:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
 
+
+    # db_user_role = db.query(models.Roles.role_name).join(models.User_has_role).filter(models.User_has_role.user_id == db_user.id).scalar()
+    db_user_role = (
+    db.query(models.Roles.role_name)
+    .join(models.User_has_role, models.Roles.id == models.User_has_role.role_id)
+    .filter(models.User_has_role.user_id == db_user.id)
+    .scalar()
+)
+    # return db_user_role
+    
+    
 
     token = create_access_token({"sub": db_user.email_id, "user_id": db_user.id})
     
@@ -146,24 +148,24 @@ async def create_user(
     user_name: str = Form(...),
     user_password: str = Form(...),
     email_id: str = Form(...),
-    phone_number: str = Form(...),
+    phone_number: int = Form(...),
     dob: str = Form(...),
     gender: str = Form(...),
     address: str = Form(...),
     city: str = Form(...),
     state: str = Form(...),
-    zip_code: str = Form(...),
+    zip_code: int = Form(...),
     country: str = Form(...),
     profile_img: UploadFile = File(...),
-    # role_id : Optional[int] = Form(None),
+    role_id : Optional[int] = Form(None),
     db: Session = Depends(get_db)
 ):
     existing = db.query(models.User).filter(       
-            models.User.user_name == user_name,
-            models.User.email_id == email_id,
-            models.User.user_password == user_password,
-            models.User.phone_number == phone_number,
-        ).first()
+            models.User.user_name == user_name and
+            models.User.email_id == email_id and
+            models.User.user_password == user_password and
+            models.User.phone_number == phone_number 
+        ).scalar()
     if existing :
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -195,30 +197,33 @@ async def create_user(
     db.commit()
     db.refresh(db_user)
 
+    if role_id :
+        user_role = models.User_has_role(
+        user_id=db_user.id,
+        role_id=role_id
+    )
 
-    #  default_role = db.query(models.Roles).filter(
-    #     models.Roles.role_name == "USER"
-    # ).first()
+    if not role_id:
+        
+        default_role = db.query(models.Roles).filter(
+        models.Roles.role_name == "user"
+        ).first()
 
-    # if not default_role:
-    #     raise HTTPException(
-    #         status_code=500,
-    #         detail="Default role not found"
-    #     )
+        if not default_role:
+            raise HTTPException(
+                status_code=500,
+                detail="Default role not found"
+                )
+        user_role = models.User_has_role(
+        user_id=db_user.id,
+        role_id=default_role.id
+    )    
 
-    # user_role = models.User_has_role(
-    #     user_id=db_user.id,
-    #     role_id=default_role.id
-    # )
 
-    # db.add(user_role)
-    # db.commit()
+    db.add(user_role)
+    db.commit()
+    db.refresh(user_role)
 
-    # return {
-    #     "message": "User created successfully",
-    #     "user_id": db_user.id,
-    #     "role": default_role.role_name
-    # }
     return db_user
 
 
@@ -284,14 +289,31 @@ async def update_user(
 
 # # delete user by id
 
-@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{user_id}")
 async def delete_user(user_id: int, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db_user = db.query(models.User).filter(models.User.id == user_id).scalar()
     if not db_user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND , detail="User not found")
-    db.delete(db_user)
-    db.commit()
-    return db_user
+    # return db_user
+    try:
+
+        
+
+        db_user_role = db.query(models.User_has_role).filter(models.User_has_role.user_id == db_user.id).first()
+        if not db_user_role:
+            return {"User does not have role"}
+        db.delete(db_user)
+        db.commit()
+        
+        db.delete(db_user_role)
+        db.commit()
+
+        return db_user
+    except:  
+        raise HTTPException(
+        status_code=403,
+        detail="Not delete"
+        )
 
 
 

@@ -1,16 +1,7 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
-import { HiOutlineMenu } from "react-icons/hi";
 import { Link, useNavigate, NavLink } from 'react-router-dom';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
 import Swal from 'sweetalert2';
-import { IoIosNotifications } from "react-icons/io";
-import { IoLogOut } from "react-icons/io5";
-import { CgProfile } from "react-icons/cg";
-import { AiFillDashboard } from "react-icons/ai";
-import { DialogContent } from '@mui/material';
+
 
 function Header({ toggleSidebar, onLogout }) {
   const navigate = useNavigate();
@@ -51,9 +42,9 @@ function Header({ toggleSidebar, onLogout }) {
         <div className='header-wrapper'>
           <div className='header-title'>
             <Link to={'/user'}>
-            <h1>
-              Products
-            </h1>
+              <h1>
+                Products
+              </h1>
             </Link>
           </div>
 
