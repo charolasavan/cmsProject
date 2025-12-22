@@ -69,16 +69,12 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 @router.get("/")
 def get_users(db: Session = Depends(get_db)):
 
-    db_user = db.query(models.User).all()
-    # db_user_role = db.query(models.User_has_role).options(
-    #     joinedload(models.User_has_role.user_role),
-    #     joinedload(models.User_has_role.role_name_user) 
-    # ).filter(models.User_has_role.user_id == models.User.id).all()
-
-
-    return db_user
-    
-        
+    # db_user = db.query(models.User).all()
+    user = db.query(models.User_has_role).options(
+        joinedload(models.User_has_role.role_name_user),
+        joinedload(models.User_has_role.user_role)
+    ).all()
+    return user       
 
 
 @router.post("/login/")
@@ -229,13 +225,18 @@ async def create_user(
 
 
 # Get User by id
-@router.get("/{user_id}", response_model=UserBase)
+@router.get("/{user_id}")
 async def get_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    # user = db.query(models.User).filter(models.User.id == user_id).first()
+    user = db.query(models.User_has_role).options(
+        joinedload(models.User_has_role.role_name_user),
+        joinedload(models.User_has_role.user_role)
+    ).filter(models.User_has_role.user_id == user_id).first()
+    return user
+    # if not user:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     
-    return user 
+    # return user 
 
 
 # Update a user by ID
@@ -282,7 +283,8 @@ async def update_user(
         db_user.profile_img = f"/static/uploads/{unique_filename}"
 
     db.commit()
-    db.refresh(db_user)
+    db.refresh(db_user)        
+
     return db_user
 
 

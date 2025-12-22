@@ -9,6 +9,7 @@ import Swal from 'sweetalert2'
 function UpdateUsers() {
     const { id } = useParams()
     const [isPasswordShown, setIsPasswordShown] = useState(false);
+    const [roleId, setRoleId] = useState()
     const [userData, setUserData] = useState({
         user_name: '',
         user_password: '',
@@ -22,6 +23,7 @@ function UpdateUsers() {
         zip_code: '',
         country: '',
         profile_img: '',
+        role_id: ''
     });
 
     const [formError, setFormError] = useState([])
@@ -110,24 +112,20 @@ function UpdateUsers() {
             if (userData.profile_img instanceof File) {
                 addUserData.append('profile_img', userData.profile_img);
             }
-            // await api.put(`/users/${id}/`, addUserData);
-            // // console.log("Update")
-            // const Toast = Swal.mixin({
-            //     toast: true,
-            //     position: "top-end",
-            //     showConfirmButton: false,
-            //     timer: 1000,
-            //     timerProgressBar: true,
-            //     didOpen: (toast) => {
-            //         toast.onmouseenter = Swal.stopTimer;
-            //         toast.onmouseleave = Swal.resumeTimer;
-            //     }
-            // });
-            // Toast.fire({
-            //     icon: "success",
-            //     title: "Update Data is successfully"
-            // });
-            // navigate(-1);
+
+            if (userData.role_id) {
+                const updateUserRole = new FormData();
+                updateUserRole.append('user_id', id)
+                updateUserRole.append('role_id', userData.role_id)
+
+                try {
+                    await api.put(`/user_has_role/${roleId}/`, updateUserRole);
+
+                }
+                catch (error) {
+                    console.log(error)
+                }
+            }
 
             try {
                 await api.put(`/users/${id}/`, addUserData);
@@ -159,33 +157,31 @@ function UpdateUsers() {
                     title: "Oops...",
                     text: error.response?.data?.detail || "Failed to add User.",
                 });
-
-
             }
         };
     }
-
 
     useEffect(() => {
         const fetchUserDetail = async () => {
             try {
                 const res = await api.get(`/users/${id}`);
                 setUserData({
-                    user_name: res.data.user_name,
-                    user_password: res.data.user_password,
-                    email_id: res.data.email_id,
-                    phone_number: res.data.phone_number,
-                    dob: res.data.dob,
-                    gender: res.data.gender,
-                    address: res.data.address,
-                    city: res.data.city,
-                    state: res.data.state,
-                    zip_code: res.data.zip_code,
-                    country: res.data.country,
-                    profile_img: res.data.profile_img
+                    user_name: res.data.user_role.user_name,
+                    user_password: res.data.user_role.user_password,
+                    email_id: res.data.user_role.email_id,
+                    phone_number: res.data.user_role.phone_number,
+                    dob: res.data.user_role.dob,
+                    gender: res.data.user_role.gender,
+                    address: res.data.user_role.address,
+                    city: res.data.user_role.city,
+                    state: res.data.user_role.state,
+                    zip_code: res.data.user_role.zip_code,
+                    country: res.data.user_role.country,
+                    profile_img: res.data.user_role.profile_img,
+                    role_id: res.data.user_role.role_id
                 });
 
-                // console.log(res)
+                setRoleId(res.data.id)
             }
             catch (error) {
                 Swal.fire({
@@ -199,8 +195,6 @@ function UpdateUsers() {
         fetchUserDetail();
     }, [id]);
 
-
-
     return (
         <div className="m-3">
             <h3>Edit User</h3>
@@ -208,12 +202,12 @@ function UpdateUsers() {
                 {/* Personal Information */}
                 <h5 className="mb-3">Personal Information</h5>
                 <Row className="mb-3">
-                    <Col md={6}>
+                    <Col md={4}>
                         <Form.Label>Full Name</Form.Label>
                         <Form.Control type="text" name='user_name' value={userData.user_name} placeholder="Savan Charola" onChange={handleChange} />
                         {formError && <span className='validationError'>{formError.user_name}</span>}
                     </Col>
-                    <Col md={6}>
+                    <Col md={4}>
                         <Form.Label>Password</Form.Label>
 
                         <div className="position-relative mb-3">
@@ -239,7 +233,19 @@ function UpdateUsers() {
                         </div>
                         {formError && <span className='validationError'>{formError.user_password}</span>}
                     </Col>
+                    <Col md={4}>
+                        <Form.Label>Role</Form.Label>
+                        <Form.Select
+                            name="role_id"
+                            value={userData.role_id}
+                            onChange={handleChange}
+                        >
+                            <option value="" disabled>Select</option>
+                            <option value='2'>User</option>
+                            <option value='1'>Admin</option>
+                        </Form.Select>
 
+                    </Col>
                 </Row>
                 <Row className='mb-3'>
                     <Col md={6}>

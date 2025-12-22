@@ -38,7 +38,7 @@ import AddTax from 'pages/Admin/layout/ProductTax/Add';
 
 // User File Define 
 import UserLayout from 'pages/User/layout/MainLayout/UserLayout';
-// import UserDashboard from 'pages/User/layout/UserDashboard/UserDashboard';
+import UserDashboard from 'pages/User/layout/UserDashboard/UserDashboard';
 
 
 
@@ -58,7 +58,10 @@ import CreateAccount from 'pages/User/layout/AccountCreate/CreateAccount';
 
 // User Profile 
 import UserProfile from 'pages/User/layout/UserProfile/UserProfile';
+import UpdateProfile from 'pages/User/layout/UserProfile/UpdateProfile';
 
+// Add to Cart 
+import AddToCart from 'pages/User/layout/AddToCart/AddToCart';
 
 
 function App() {
@@ -124,10 +127,10 @@ function App() {
             </PrivateRoute>
           }
         >
-          {/* <Route index element={<UserDashboard />} /> */}
-          <Route index element={<UserProductList   />} />
+          <Route index element={<UserDashboard />} />
+          {/* <Route index  element={<UserProductList   />} /> */}
 
-          
+
           {/* Category  */}
           {/* <Route path="categories" element={<UserCategoryList />} /> */}
 
@@ -138,8 +141,13 @@ function App() {
           {/* Orders  */}
           <Route path="orders" element={<UserOrderList />} />
 
-          {/* categories */}
+          {/* categories */}  
           <Route path="profile" element={<UserProfile />} />
+          <Route path="profile/update/:id" element={<UpdateProfile />} />
+
+          {/* Add To Cart */}
+          <Route path="addtocart" element={<AddToCart />} />
+
 
         </Route>
 

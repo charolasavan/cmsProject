@@ -139,10 +139,6 @@ function AddUser() {
                 // alert('Failed to upload product');
             }
         }
-
-
-
-
     };
     return (
         <Container className="py-4">

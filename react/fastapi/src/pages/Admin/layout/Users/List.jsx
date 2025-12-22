@@ -338,14 +338,14 @@ function Users() {
                                 </Button>
                             </span>
                         </th>
-                        {/* <th>
+                        <th>
                             User Role
                             <span className='ps-2'>
                                 <Button onClick={() => handleSort('id')}>
                                     <HiMiniArrowsUpDown />
                                 </Button>
                             </span>
-                        </th> */}
+                        </th>
                         <th>
                             Full Name
                             <span className='ps-2'>
@@ -443,24 +443,24 @@ function Users() {
                 <tbody>
                     {filterData.map((data) => {
                         return (
-                            <tr key={data.id}>
-                                <td>{data.id}</td>
-                                {/* <td>{data.role_name_user.role_name}</td> */}
-                                <td>{data.user_name}</td>
-                                <td>{data.user_password}</td>
-                                <td>{data.email_id}</td>
-                                <td>{data.phone_number}</td>
-                                <td>{data.dob}</td>
-                                <td>{data.gender}</td>
-                                <td>{data.address}</td>
-                                <td>{data.city}</td>
-                                <td>{data.state}</td>
-                                <td>{data.zip_code}</td>
-                                <td>{data.country}</td>
+                            <tr key={data.user_role.id}>
+                                <td>{data.user_role.id}</td>
+                                <td>{data.role_name_user.role_name}</td>
+                                <td>{data.user_role.user_name}</td>
+                                <td>{data.user_role.user_password}</td>
+                                <td>{data.user_role.email_id}</td>
+                                <td>{data.user_role.phone_number}</td>
+                                <td>{data.user_role.dob}</td>
+                                <td>{data.user_role.gender}</td>
+                                <td>{data.user_role.address}</td>
+                                <td>{data.user_role.city}</td>
+                                <td>{data.user_role.state}</td>
+                                <td>{data.user_role.zip_code}</td>
+                                <td>{data.user_role.country}</td>
                                 <td>
                                     <img
                                         className='profile_img'
-                                        src={`http://localhost:8000${data.profile_img}`}  // Display image with full URL
+                                        src={`http://localhost:8000${data.user_role.profile_img}`}  // Display image with full URL
                                         alt='profile_img'
 
 
@@ -468,13 +468,13 @@ function Users() {
                                 </td>
 
                                 <td>
-                                    <Link to={`/admin/users/update/${data.id}`}>
+                                    <Link to={`/admin/users/update/${data.user_role.id}`}>
                                         <Button>Edit</Button>
                                     </Link>
                                 </td>
                                 <td>
                                     <Button variant="danger" onClick={() => {
-                                        handleDelete(data.id)
+                                        handleDelete(data.user_role.id)
                                     }}>Delete</Button>
 
                                 </td>

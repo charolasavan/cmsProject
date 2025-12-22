@@ -113,11 +113,13 @@ body.swal2-height-auto { height: 100% !important; }
 .main-header .header-wrapper { display:  flex; justify-content: space-between; align-items: center;  width: 100%;}
 
 .main-header .header-wrapper .header-title h1 { font-size: 60px; color: black; font-weight: bold; }
-.main-header .header-wrapper .user-buttons { display: flex; }
+.main-header .header-wrapper .user-buttons { display: flex; align-items: center; gap: 18px; }
 .main-header .header-wrapper .user-buttons .profile button { padding: 14px 30px; border-radius: 70px; background-color: #FFFFFF; font-size: 18px; color: black; border: 1px solid black; transition: all 0.3s ease-in-out; }
 .main-header .header-wrapper .user-buttons .profile button:hover { background-color: black; color: white; }
-.main-header .header-wrapper .user-buttons .logout button { padding: 14px 30px; border-radius: 70px; background-color: black; font-size: 18px; color: white; border: 1px solid white; margin-left: 20px; transition: all 0.3s ease-in-out; } 
+.main-header .header-wrapper .user-buttons .logout button { padding: 14px 30px; border-radius: 70px; background-color: black; font-size: 18px; color: white; border: 1px solid white;  transition: all 0.3s ease-in-out; } 
 .main-header .header-wrapper .user-buttons .logout button:hover {  background-color: #FFFFFF; color: black; border: 1px solid black; }
+.main-header .header-wrapper .user-buttons .add-to-cart button { background-color: white; padding: 10px 15px; border-radius: 50%;  transition: all 0.3s ease-in-out;}
+.main-header .header-wrapper .user-buttons .add-to-cart button:hover { background-color: black; color: white; }
 
 /* User Product Page */
 
@@ -202,3 +204,18 @@ ol, ul { padding-left: 0!important; margin: 0; }
 .product-detail-section .main-section .product-slider .carousel-content .product-image { height: 100%; width: 100%; }
 /* .product-detail-section .main-section .product-slider .carousel-content .product-image .images {  max-height: 490px; max-width: 550px; } */
 .product-detail-section .main-section .product-slider .carousel-content .product-image .images img{  max-width: 780px; max-height:780px ; object-fit: cover;}
+
+
+
+.card { border: none !important }
+.card-header { border:  none !important; background-color: white !important;}
+
+
+
+
+
+.add-to-cart-main-section { margin-top: 120px; }
+.add-to-cart-main-section table tbody tr td .manage-quantity { display: flex; justify-content: center; align-items: center;  gap: 20px;}
+.add-to-cart-main-section table tbody tr td .manage-quantity .add-quantity,.minus-quantity { padding: 3px 11px; border-radius: 50%; font-size: 18px; }
+
+

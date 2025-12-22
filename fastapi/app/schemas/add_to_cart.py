@@ -8,4 +8,4 @@ class AddToCartBase(BaseModel):
     product_quantity : Optional[int]
     regular_price : Optional[int] 
     selling_price : Optional[int]
-    # coupon_code : Optional[str] = None
+    coupon_code : Optional[str] = None

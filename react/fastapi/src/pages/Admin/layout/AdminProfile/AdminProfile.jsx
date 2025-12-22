@@ -25,7 +25,7 @@ function AdminProfile() {
     const newUser = JSON.parse(userIs);
     try {
       const response = await api.get(`/users/${newUser.id}`);
-      setUserData(response.data)
+      setUserData(response.data.user_role)
 
     } catch (error) {
       console.error(error);
@@ -45,7 +45,7 @@ function AdminProfile() {
           <h3 className="mb-0">User Profile</h3>
         </Card.Header>
         <Card.Body className="p-4">
-          <Link to={`/edituser/${userData.id}`}>
+          <Link to={`/admin/users/update/${userData.id}`}>
             <Button variant='btn btn-success'>update</Button>
           </Link>
           <Row className="mb-4 justify-content-center text-center">

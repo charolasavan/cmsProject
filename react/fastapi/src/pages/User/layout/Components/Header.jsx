@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
 import Swal from 'sweetalert2';
-
+import { FaCartShopping } from "react-icons/fa6";
 
 function Header({ toggleSidebar, onLogout }) {
   const navigate = useNavigate();
@@ -61,6 +61,13 @@ function Header({ toggleSidebar, onLogout }) {
               <button onClick={logout}>
                 logout
               </button>
+            </div>
+            <div className='add-to-cart'>
+              <Link to={'addtocart'}>
+                <button>
+                  <FaCartShopping />
+                </button>
+              </Link>
             </div>
           </div>
 

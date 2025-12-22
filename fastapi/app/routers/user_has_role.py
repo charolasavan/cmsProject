@@ -46,3 +46,25 @@ def create_role(
             db.refresh(new_user)
         except:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User Not Add")
+
+
+@router.put("/{id}/", response_model=UserhasroleBase, status_code=status.HTTP_200_OK)
+async def update_user_role(
+    id : int ,
+    user_id: Optional[int] = Form(...),
+    role_id: Optional[int] = Form(...),
+    db: Session = Depends(get_db)
+):
+    db_user_role = db.query(models.User_has_role).filter(models.User_has_role.id == id).first()
+
+    if not db_user_role:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Please Select valid Role "
+        )
+
+    db_user_role.user_id = user_id
+    db_user_role.role_id = role_id
+
+    db.commit()
+    return db_user_role

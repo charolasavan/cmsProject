@@ -3,7 +3,8 @@ import api from 'api/apiClient';
 import { FaArrowRight } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
 function CategoryProductView({ searchProduct }) {
-    // console.log(props)
+    // console.log(props)\
+
     const [productData, setProductData] = useState([])
     const [filterData, setFilterData] = useState([])
     const category_id = parseInt(searchProduct.category_id);
@@ -19,7 +20,6 @@ function CategoryProductView({ searchProduct }) {
             console.log(error?.response?.data?.detail || error.message || "Faild To Fetch Iteams")
         }
     }
-
 
 
 
@@ -65,7 +65,7 @@ function CategoryProductView({ searchProduct }) {
                         <div className="product-detail">
                             <h3>{data.product_name}</h3>
                             {/* <p>₹{data.selling_price}</p> */}
-                            {data.selling_price ==0 ? <p>₹{data.regular_price}</p> : <p>₹{data.selling_price}</p> }
+                            {data.selling_price == 0 ? <p>₹{data.regular_price}</p> : <p>₹{data.selling_price}</p>}
                         </div>
                         <div className="product-add-cart">
                             <button>

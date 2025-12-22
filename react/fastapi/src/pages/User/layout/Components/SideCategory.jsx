@@ -52,7 +52,7 @@ function SideCategory() {
                     {renderOptions(categories)}
                 </ul>
             </Form.Group>
-            {/* {console.log(searchProduct)} */}
+            {/* {console.log(sewarchProduct)} */}
             <CategoryProductView searchProduct={searchProduct} />
         </div>
 
