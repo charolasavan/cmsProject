@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from 'api/apiClient'
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, resolvePath, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Swal from 'sweetalert2';
 import "slick-carousel/slick/slick.css";
@@ -41,6 +41,7 @@ function CouponList() {
             });
         }
     };
+
 
     // Handle Delete coupons
     const handleDelete = async (id) => {
@@ -96,6 +97,7 @@ function CouponList() {
                         <tr>
                             <th>id</th>
                             <th>Coupon</th>
+                            <th>Specific Product</th>
                             <th>Disoccunt Price</th>
                             <th>Expire Date</th>
                             <th>Use Limit</th>
@@ -106,11 +108,12 @@ function CouponList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {coupon.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((data) => {
+                        {coupon.map((data) => {
                             return (
                                 <tr key={`${data.id}-${data.code}`}>
                                     <td>{data.id}</td>
                                     <td>{data.code}</td>
+                                    <td>{data.product != null ? data.product.product_name : "All"}</td>
                                     <td>{'₹' + data.discount_price}</td>
                                     <td>{data.expires_date}</td>
                                     <td>{data.usage_limit}</td>
@@ -146,13 +149,13 @@ function CouponList() {
                     </tbody>
                 </Table>
 
-                <Pagination
+                {/* <Pagination
                     count={coupon.length}
                     page={page}
                     onPageChange={handleChangePage}
                     rowsPerPage={rowsPerPage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
-                />
+                /> */}
 
             </div>
 

@@ -20,7 +20,7 @@ function OrderList() {
             const response = await api.get('/orders/')
             setOrder(response.data)
             setFilterData(response.data)
-            console.log(order)
+            // console.log(order)
         }
         catch (error) {
             Swal.fire({

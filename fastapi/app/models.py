@@ -115,6 +115,7 @@ class Products(Base):
         cascade="all, delete-orphan"
     )
     cart_product = relationship("AddToCart", back_populates="product_cart")
+    coupons = relationship("CouponCode", back_populates="product")
 
 
 # ===================== PRODUCT IMAGE =====================
@@ -136,9 +137,10 @@ class AddToCart(Base):
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
     product_quantity = Column(Integer, nullable=False)
-    regular_price = Column(Integer, nullable=False)
-    selling_price = Column(Integer, nullable=False)
+    regular_price = Column(Float, nullable=False)
+    selling_price = Column(Float, nullable=False)
     coupon_code = Column(String(500), nullable = False)
+    sub_total_price = Column(Float, nullable = False)
 
     # SAME NAMES
     user_cart = relationship("User", back_populates="cart")
@@ -178,12 +180,15 @@ class CouponCode(Base):
     __tablename__ = "coupon_code"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=True)
     code = Column(String(250))
     discount_price = Column(Integer)
     expires_date = Column(Date, nullable=False)
     is_active = Column(Integer)
     usage_limit = Column(Integer)
     usage_count = Column(Integer, default=0)
+
+    product = relationship("Products", back_populates="coupons")
 
 
 # ===================== PRODUCT TAX =====================

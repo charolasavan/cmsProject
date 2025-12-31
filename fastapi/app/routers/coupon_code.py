@@ -21,8 +21,13 @@ def get_db():
 #  Get all products
 @router.get("/")
 def get_coupons(db: Session = Depends(get_db)):
-    db_coupons = db.query(models.CouponCode).all()
-    return db_coupons
+    # db_coupons = db.query(models.CouponCode).all()
+    db_coupon = db.query(models.CouponCode).options(
+        joinedload(models.CouponCode.product)
+    ).all()
+    if not db_coupon:
+        return { "Not found" }
+    return db_coupon
 
 # Generate  Coupon Code 
 
@@ -36,14 +41,15 @@ async def generate_coupons(
   expires_date : str  =  Form(...),
   is_active : bool = Form(...),
   usage_limit : int = Form(...),
-
+  product_id : Optional[int]= Form(None),
   db : Session = Depends(get_db)  
 ):
-    if code:
 
+
+
+    if code:
         existing_coupon = db.query(models.CouponCode).filter(models.CouponCode.code == code).first()
         if existing_coupon:
-            
             return {"error": "Coupon code already exists"}
     else:
         code = generate_unique_coupon_code()
@@ -56,6 +62,8 @@ async def generate_coupons(
     if expire.date() < today:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="Date Must be Greate To Now")
 
+
+
     else:
         is_active = True
         db_coupons = models.CouponCode(
@@ -64,6 +72,7 @@ async def generate_coupons(
         expires_date = expire,
         is_active = is_active,
         usage_limit = usage_limit,
+        product_id = product_id
     )
     db.add(db_coupons)
     db.commit()
@@ -151,7 +160,7 @@ async def apply_coupon_code(
         raise HTTPException(status_code=404, detail="Invalid coupon code")
     if not valid_coupon.is_active:
         raise HTTPException(status_code=400, detail="Coupon is inactive")
-    if valid_coupon.expires_date < datetime.now():
+    if valid_coupon.expires_date < datetime.now().date():
         raise HTTPException(status_code=400, detail="Coupon has expired")
     if valid_coupon.usage_limit and valid_coupon.usage_count >= valid_coupon.usage_limit:
         raise HTTPException(status_code=400, detail="Coupon usage limit reached")

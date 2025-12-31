@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Form, Image, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom'
 import api from 'api/apiClient'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from 'react-router-dom';
 function UserProfile() {
+  const navigate = useNavigate();
   const [userData, setUserData] = useState({
     // id: null,
     user_name: '',
@@ -40,6 +42,11 @@ function UserProfile() {
 
   return (
     <Container >
+      <div className='back-to-page'>
+        <button onClick={() => navigate(-1)}>
+          Back to page
+        </button>
+      </div>
       <Card>
         <Card.Header className="bg-gradient text-black text-center py-4" >
           <h3 className="mb-0">User Profile</h3>

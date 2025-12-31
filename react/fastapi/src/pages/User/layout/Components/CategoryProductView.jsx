@@ -1,95 +1,102 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import api from 'api/apiClient';
 import { FaArrowRight } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+
 function CategoryProductView({ searchProduct }) {
-    // console.log(props)\
 
-    const [productData, setProductData] = useState([])
-    const [filterData, setFilterData] = useState([])
-    const category_id = parseInt(searchProduct.category_id);
+    const [filterData, setFilterData] = useState([]);
 
-    const fetchProduct = async () => {
+    const handleSetCart = async (product_id) => {
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (!user) {
+            Swal.fire("Please login first");
+            return;
+        }
+
+        const cartData = new FormData();
+        cartData.append('user_id', user.id);
+        cartData.append('product_id', product_id);
+        cartData.append('product_quantity', 1);
+
         try {
-            const response = await api.get('/products/')
-            // console.log(response.data)
-            setProductData(response.data);
-            setFilterData(response.data)
+            await api.post('/addtocart/', cartData);
+            Swal.fire({
+                icon: 'success',
+                title: 'Add To Cart Successfully',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 1000,
+            });
+        } catch (error) {
+            Swal.fire("Failed to add cart");
         }
-        catch (error) {
-            console.log(error?.response?.data?.detail || error.message || "Faild To Fetch Iteams")
-        }
-    }
-
-
+    };
 
     useEffect(() => {
-        fetchProduct();
-        // fetchCategoryProduct()
-    }, [])
-
-    useEffect(() => {
-        const fetchCategoryProduct = async () => {
+        const fetchProducts = async () => {
             try {
-                if (category_id) {
-                    const responseData = await api.post(`/products/category/${category_id}`)
-                    if (responseData.data && responseData.data.length > 0) {
-                        setFilterData(responseData.data)
-                    }
-                    else {
-                        setFilterData([])
-                    }
+                // ✅ ALL PRODUCTS
+                if (!searchProduct.category_id) {
+                    const response = await api.get('/products/');
+                    setFilterData(response.data);
                 }
+                // ✅ CATEGORY PRODUCTS
+                else {
+                    const response = await api.post(
+                        `/products/category/${parseInt(searchProduct.category_id)}`
+                    );
+                    setFilterData(response.data || []);
+                }
+            } catch (error) {
+                setFilterData([]);
             }
-            catch (error) {
-                console.log('product Not found')
-            }
-        }
-        fetchCategoryProduct()
-    }, [category_id])
+        };
+
+        fetchProducts();
+    }, [searchProduct.category_id]);
     return (
         <>
-            {filterData.map((data, index) => {
-                return (
-                    <div key={index} className="product-card">
+            {filterData.length > 0 ? (
+                filterData.map((data) => (
+                    <div key={data.id} className="product-card">
                         <div className="product-img">
                             <Link to={`/user/products/${data.id}`}>
-
                                 <img
-                                    className='thumbnail_img'
+                                    className="thumbnail_img"
                                     src={`http://localhost:8000${data.thumbnail_image}`}
-                                    alt='productImage'
+                                    alt={data.product_name}
                                 />
                             </Link>
                         </div>
+
                         <div className="product-detail">
                             <h3>{data.product_name}</h3>
-                            {/* <p>₹{data.selling_price}</p> */}
-                            {data.selling_price == 0 ? <p>₹{data.regular_price}</p> : <p>₹{data.selling_price}</p>}
+                            <p>
+                                ₹{data.selling_price === 0
+                                    ? data.regular_price
+                                    : data.selling_price}
+                            </p>
                         </div>
+
                         <div className="product-add-cart">
-                            <button>
+                            <button onClick={() => handleSetCart(data.id)}>
                                 Add to cart <span><FaArrowRight /></span>
                             </button>
                         </div>
                     </div>
-                )
-            })}
-
-            {filterData == '' && (
-                <>
-                    <div className="flex">
-                        <h1>
-                            Not Found
-                        </h1>
-                    </div>
-
-                </>
-
+                ))
+            ) : (
+                <div className="flex">
+                    <h1>Not Found</h1>
+                </div>
             )}
         </>
+    );
 
-    )
 }
 
-export default CategoryProductView
+export default CategoryProductView;

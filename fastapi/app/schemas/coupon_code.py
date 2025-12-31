@@ -4,6 +4,7 @@ from typing import Optional
 
 class CouponCodeBase(BaseModel):
     id: int
+    product_id : Optional[int]
     code : Optional[str]
     discount_price : Optional[int]
     expires_date : Optional[date]

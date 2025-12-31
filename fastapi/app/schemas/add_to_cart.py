@@ -6,6 +6,7 @@ class AddToCartBase(BaseModel):
     user_id : Optional[int]
     product_id : Optional[int]
     product_quantity : Optional[int]
-    regular_price : Optional[int] 
-    selling_price : Optional[int]
+    regular_price : Optional[float] 
+    selling_price : Optional[float]
     coupon_code : Optional[str] = None
+    sub_total_price: Optional[float]

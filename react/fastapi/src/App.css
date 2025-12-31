@@ -112,6 +112,10 @@ body.swal2-height-auto { height: 100% !important; }
 .main-header { width: 100%;  margin-top: 32px;}
 .main-header .header-wrapper { display:  flex; justify-content: space-between; align-items: center;  width: 100%;}
 
+.user-main-section .view-product-section { padding: 14px 50px; background-color: white; color: black; border: 1px solid black;  transition: all 0.3s ease-in-out; border-radius: 32px;}
+.user-main-section .view-product-section:hover { background-color: black; color: white;}
+
+
 .main-header .header-wrapper .header-title h1 { font-size: 60px; color: black; font-weight: bold; }
 .main-header .header-wrapper .user-buttons { display: flex; align-items: center; gap: 18px; }
 .main-header .header-wrapper .user-buttons .profile button { padding: 14px 30px; border-radius: 70px; background-color: #FFFFFF; font-size: 18px; color: black; border: 1px solid black; transition: all 0.3s ease-in-out; }
@@ -174,11 +178,12 @@ ol, ul { padding-left: 0!important; margin: 0; }
 .list-products .product-card .product-add-cart button:hover {  background-color: black; color: white; border: 1px solid white; }
 
 
-
+.back-to-page button{ padding: 14px 50px; background-color: white; color: black; border: 1px solid black;  transition: all 0.3s ease-in-out; border-radius: 32px;}
+.back-to-page button:hover { background-color: black; color: white;}
 
 .product-detail-section { margin-top: 80px; }
-.product-detail-section .back-to-page button{ padding: 14px 50px; background-color: white; color: black; border: 1px solid black;  transition: all 0.3s ease-in-out; border-radius: 32px;}
-.product-detail-section .back-to-page button:hover { background-color: black; color: white;}
+/* .product-detail-section .back-to-page button{ padding: 14px 50px; background-color: white; color: black; border: 1px solid black;  transition: all 0.3s ease-in-out; border-radius: 32px;} */
+/* .product-detail-section .back-to-page button:hover { background-color: black; color: white;} */
 .product-detail-section .main-section { display: grid; justify-content: space-between; align-items: center;    grid-template-columns: 2fr 1fr ;}
 .product-detail-section .main-section .product-information { max-width: 720px; }
 .product-detail-section .main-section .product-information .product-name { margin-top: 24px; }
@@ -217,5 +222,16 @@ ol, ul { padding-left: 0!important; margin: 0; }
 .add-to-cart-main-section { margin-top: 120px; }
 .add-to-cart-main-section table tbody tr td .manage-quantity { display: flex; justify-content: center; align-items: center;  gap: 20px;}
 .add-to-cart-main-section table tbody tr td .manage-quantity .add-quantity,.minus-quantity { padding: 3px 11px; border-radius: 50%; font-size: 18px; }
+
+
+
+
+
+
+
+
+
+
+
 
 

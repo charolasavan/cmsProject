@@ -314,7 +314,7 @@ function UpdateProfile() {
                         <Button type="submit" className="me-2" variant="primary">
                             Submit
                         </Button>
-                        <Button variant="secondary" onClick={() => navigate('/admin/users')}>
+                        <Button variant="secondary" onClick={() => navigate(-1)}>
                             Cancel
                         </Button>
                     </div>

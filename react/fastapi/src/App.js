@@ -35,6 +35,7 @@ import EditCoupon from 'pages/Admin/layout/Coupons/Update';
 // ProductTax
 import ProductTaxList from 'pages/Admin/layout/ProductTax/List';
 import AddTax from 'pages/Admin/layout/ProductTax/Add';
+import EditTax from 'pages/Admin/layout/ProductTax/Update';
 
 // User File Define 
 import UserLayout from 'pages/User/layout/MainLayout/UserLayout';
@@ -102,6 +103,7 @@ function App() {
           {/* Product Tax */}
           <Route path="tax" element={<ProductTaxList />} />
           <Route path="tax/add" element={<AddTax />} />
+          <Route path="tax/update/:id" element={<EditTax />} />
 
           {/* Orders */}
           <Route path="orders" element={<OrderList />} />
@@ -141,7 +143,7 @@ function App() {
           {/* Orders  */}
           <Route path="orders" element={<UserOrderList />} />
 
-          {/* categories */}  
+          {/* categories */}
           <Route path="profile" element={<UserProfile />} />
           <Route path="profile/update/:id" element={<UpdateProfile />} />
 

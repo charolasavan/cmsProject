@@ -12,7 +12,9 @@ function AddCoupon() {
         expires_date: '',
         is_active: false,
         usage_limit: 0,
+        product_id: null
     });
+    const [products, setProducts] = useState([])
     const [couponType, setCouponType] = useState('AutoGenerate')
     const [formError, setFormError] = useState([])
     const navigate = useNavigate();
@@ -24,6 +26,22 @@ function AddCoupon() {
             ...prev,
             [e.target.name]: e.target.value
         }))
+    }
+
+    const handelFetchProducts = async () => {
+        try {
+            const respons = await api.get('/products/')
+            if (respons.data) {
+                setProducts(respons.data)
+            }
+            else {
+                setProducts([])
+            }
+        }
+        catch (error) {
+            console.log(error)
+        }
+
     }
 
     const handleSubmit = async (e) => {
@@ -58,6 +76,7 @@ function AddCoupon() {
             addCoupon.append('expires_date', coupon.expires_date);
             addCoupon.append('is_active', coupon.is_active);
             addCoupon.append('usage_limit', coupon.usage_limit);
+            addCoupon.append('product_id', coupon.product_id)
 
             try {
                 await api.post('/coupons/', addCoupon);
@@ -77,7 +96,7 @@ function AddCoupon() {
                     icon: "success",
                     title: "Coupon Create successfully"
                 });
-                navigate('/coupon');
+                navigate('coupons');
             }
             catch (error) {
                 Swal.fire({
@@ -88,6 +107,10 @@ function AddCoupon() {
             }
         }
     }
+
+    useEffect(() => {
+        handelFetchProducts()
+    },[])
     return (
         <div className="m-3">
             <h3>Add Coupon</h3>
@@ -122,7 +145,24 @@ function AddCoupon() {
                             />
                             {couponType === "Manual" && formError.code && <span className='validationError'>{formError.code}</span>}
                         </Form.Group>
-
+                    </Col>
+                    <Col>
+                        <Form.Group className='mb-3'>
+                            <Form.Label>Select Product</Form.Label>
+                            <Form.Select
+                                name="product_id"
+                                value={coupon.product_id}
+                                onChange={handleChange}
+                            >
+                                <option value=""  >Applt to All</option>
+                                {products.map((product) => {
+                                    return (
+                                        <option key={product.id} value={product.id} >{product.product_name}</option>
+                                    )
+                                })}
+                            </Form.Select>
+                            {formError.is_active && <span className='validationError'>{formError.is_active}</span>}
+                        </Form.Group>
                     </Col>
                     <Col>
                         <Form.Group className="mb-3">

@@ -1,17 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, NavLink } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { FaCartShopping } from "react-icons/fa6";
-
+import api from 'api/apiClient'
 function Header({ toggleSidebar, onLogout }) {
   const navigate = useNavigate();
+  const [countCart, setCountCart] = useState()
+  const userData = JSON.parse(window.localStorage.getItem('user'))
+  const user_id = userData.id
+
+  const fetchCartCount = async () => {
+    try {
+      const response = await api.get(`/addtocart/${user_id}`)
+      if (response.data) {
+        setCountCart(response.data.length)
+      }
+    }
+    catch (error) {
+      console.log(error)
+    }
+  }
 
   const logout = () => {
     try {
-      localStorage.removeItem('user');
-      localStorage.removeItem('auth');
-      localStorage.removeItem('token');
-      localStorage.removeItem('userRole')
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("isLoggedin");
+      localStorage.removeItem("auth");
       onLogout();
       Swal.fire({
         toast: true,
@@ -26,7 +42,7 @@ function Header({ toggleSidebar, onLogout }) {
           toast.addEventListener('mouseleave', Swal.resumeTimer);
         }
       });
-      navigate('/login');
+      navigate("/login", { replace: true });
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -35,6 +51,10 @@ function Header({ toggleSidebar, onLogout }) {
       });
     }
   };
+
+  useEffect(() => {
+    fetchCartCount()
+  }, [])
 
   return (
     <header className="main-header">

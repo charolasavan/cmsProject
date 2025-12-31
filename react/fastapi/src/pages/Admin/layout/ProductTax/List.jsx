@@ -17,6 +17,7 @@ function ProductTaxList() {
         try {
             const response = await api.get('/tax/')
             setTexData(response.data);
+            // console.log(response.data)
         }
         catch (error) {
             Swal.fire({
@@ -43,7 +44,7 @@ function ProductTaxList() {
 
         if (result.isConfirmed) {
             try {
-                await api.delete(`/tax/${id}`);
+                await api.delete(`/tax/${id}/`);
                 setTexData(taxData.filter(taxData => taxData.tax_id !== id));
                 Swal.fire({
                     title: "Deleted!",
@@ -119,13 +120,13 @@ function ProductTaxList() {
                                         }
                                     </td>
                                     <td>
-                                        <Link to={`/admin/products/update/${data.id}`}>
+                                        <Link to={`/admin/tax/update/${data.tax_id}`}>
                                             <Button>Edit</Button>
                                         </Link>
                                     </td>
                                     <td>
                                         <Button variant="danger" onClick={() => {
-                                            handleDelete(data.id)
+                                            handleDelete(data.tax_id)
                                         }}>Delete</Button>
 
                                     </td>
