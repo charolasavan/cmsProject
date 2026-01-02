@@ -155,7 +155,9 @@ async def apply_coupon_code(
     code: str = Form(...),
     db: Session = Depends(get_db)
 ):
-    valid_coupon = db.query(models.CouponCode).filter(models.CouponCode.code == code).first()
+    # valid_coupon = db.query(models.CouponCode).filter(models.CouponCode.code == code).first()
+    db_product = db.query(models.Products).filter(models.CouponCode)
+
     if not valid_coupon:
         raise HTTPException(status_code=404, detail="Invalid coupon code")
     if not valid_coupon.is_active:

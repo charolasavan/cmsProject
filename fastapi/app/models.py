@@ -138,7 +138,7 @@ class AddToCart(Base):
     product_id = Column(Integer, ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
     product_quantity = Column(Integer, nullable=False)
     regular_price = Column(Float, nullable=False)
-    selling_price = Column(Float, nullable=False)
+    selling_price = Column(Integer, nullable=False)
     coupon_code = Column(String(500), nullable = False)
     sub_total_price = Column(Float, nullable = False)
 

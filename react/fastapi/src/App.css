@@ -107,7 +107,7 @@ body.swal2-height-auto { height: 100% !important; }
 
 
 /* user website css */
-.container { max-width: 1620px !important; margin: 0 auto; }
+.container { max-width: 1420px !important; margin: 0 auto; }
 .main-wrapper { height: 100%; width: 100%; position: relative;}
 .main-header { width: 100%;  margin-top: 32px;}
 .main-header .header-wrapper { display:  flex; justify-content: space-between; align-items: center;  width: 100%;}
@@ -222,6 +222,7 @@ ol, ul { padding-left: 0!important; margin: 0; }
 .add-to-cart-main-section { margin-top: 120px; }
 .add-to-cart-main-section table tbody tr td .manage-quantity { display: flex; justify-content: center; align-items: center;  gap: 20px;}
 .add-to-cart-main-section table tbody tr td .manage-quantity .add-quantity,.minus-quantity { padding: 3px 11px; border-radius: 50%; font-size: 18px; }
+.add-to-cart-main-section table tbody input { text-align: center; border:  1px solid cyan;  }
 
 
 
